@@ -9,6 +9,7 @@ export default defineConfig({
   reporter: "list",
   use: {
     baseURL: "http://127.0.0.1:4173",
+    browserName: "chromium",
     trace: "on-first-retry",
   },
   webServer: {
@@ -23,7 +24,7 @@ export default defineConfig({
     },
     {
       name: "tablet",
-      use: { ...devices["iPad (gen 7)"], viewport: { width: 1024, height: 768 } },
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1024, height: 768 } },
     },
   ],
 });

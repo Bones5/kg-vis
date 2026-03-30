@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { GraphErrorBoundary } from "@/features/graph/components/GraphErrorBoundary";
 
-function ErrorThrower() {
+function ErrorThrower(): JSX.Element {
   throw new Error("Storybook forced render failure");
 }
 
@@ -10,6 +10,9 @@ const meta = {
   component: GraphErrorBoundary,
   parameters: {
     layout: "centered",
+  },
+  args: {
+    children: <div />,
   },
 } satisfies Meta<typeof GraphErrorBoundary>;
 

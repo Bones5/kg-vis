@@ -18,6 +18,8 @@ KG-Vis is a React + TypeScript prototype for exploring a knowledge graph as a he
 | State/data loading | React hooks + deterministic mock data |
 | Animation | `@rive-app/react-canvas` |
 | Styling | Plain CSS loaded from `src/styles/*.css` |
+| Component docs | Storybook |
+| E2E testing | Playwright |
 
 ## Current scripts
 
@@ -26,9 +28,10 @@ npm install
 npm run dev
 npm run build
 npm run preview
+npm run storybook
+npm run build-storybook
+npm run test:e2e
 ```
-
-At the moment the repository does **not** yet ship dedicated lint, unit test, Storybook, or Playwright scripts. Those are part of the next phase documented in [`MILESTONES.md`](./MILESTONES.md).
 
 ## What is implemented now
 
@@ -43,6 +46,34 @@ At the moment the repository does **not** yet ship dedicated lint, unit test, St
 - `HexRing` shows the selected cluster at the center, surrounding neighbor clusters in tiers, and off-map stub navigation for overflow
 - `Minimap` supports quick navigation while drilled in
 - `GraphErrorBoundary` protects the main visualization shell
+
+### Storybook coverage
+
+Storybook stories are included for stable primitives and composed graph states:
+
+- Primitives:
+  - `HexPill`
+  - `Minimap`
+  - `RoutedEdges`
+  - `GraphErrorBoundary`
+- Composed:
+  - `HexOverview`
+  - `HexRing`
+  - `HexGraphView`
+
+Stories reuse `generateMockGraph()` so they remain deterministic.
+
+### Playwright coverage
+
+Playwright end-to-end tests cover the current user journey:
+
+- app load
+- cluster drill-in
+- breadcrumb return
+- minimap navigation
+- keyboard activation on overflow stubs
+
+Tests run in desktop and tablet viewport projects.
 
 ### Data model
 
@@ -90,6 +121,8 @@ src/
     progress/
     clustering/
     metrics/
+  stories/
+    *.stories.tsx
   shared/
     components/
     hooks/
@@ -98,6 +131,12 @@ src/
   styles/
     global.css
     hex.css
+e2e/
+  graph-navigation.spec.ts
+.storybook/
+  main.ts
+  preview.ts
+playwright.config.ts
 ```
 
 ## Milestone snapshot
@@ -113,37 +152,8 @@ src/
 | Progress tracking | 🟡 | Stub APIs exist, but no persistence or panel yet |
 | Clustering controls | 🟡 | Placeholder hook/panel exist, but no behavior yet |
 | Metrics overlay | 🟡 | Placeholder hook/panel exist, but no behavior yet |
-| Storybook | ⚪ | Not started |
-| Playwright | ⚪ | Not started |
-
-## Plan to flesh out Storybook and Playwright
-
-### Storybook
-
-1. Add Storybook for Vite and expose it through `npm` scripts.
-2. Start with stories for the stable UI primitives:
-   - `HexPill`
-   - `Minimap`
-   - `RoutedEdges`
-   - `GraphErrorBoundary`
-3. Add composite stories for:
-   - `HexOverview`
-   - `HexRing`
-   - `HexGraphView`
-4. Use the existing deterministic mock graph so stories stay reproducible.
-5. Add stories for hover, active, overflow, and empty/error states.
-
-### Playwright
-
-1. Add a smoke test for first load of the mock graph.
-2. Add interaction coverage for:
-   - drilling into a cluster
-   - returning via breadcrumbs
-   - minimap navigation
-   - keyboard activation on overflow stubs
-3. Add viewport coverage for desktop and tablet layouts.
-4. Keep tests deterministic by relying on mock data rather than a live backend.
-5. Once Storybook exists, consider component-level Playwright checks against Storybook stories for stable visual and interaction coverage.
+| Storybook | ✅ | Config, scripts, and primitive/composed stories are implemented |
+| Playwright | ✅ | Config, scripts, and e2e user-journey coverage are implemented |
 
 ## Suggested hosted dev setup
 
@@ -151,7 +161,7 @@ For the next phase, the cleanest hosted workflow is:
 
 - **Vercel** for the main app preview environment
 - **Chromatic** for hosted Storybook publishing, review links, and visual regression baselines
-- **GitHub Actions** for build/test automation once Storybook and Playwright are added
+- **GitHub Actions** for build/test automation including Storybook build and Playwright checks
 
 Why this combination:
 
@@ -166,4 +176,3 @@ If you want a single-platform fallback, Netlify can host both the app preview an
 - Use the `@/` alias for imports from `src/`.
 - Keep feature work inside the existing feature-first structure.
 - Treat the mock graph generator as the default deterministic fixture source until a real backend contract is introduced.
-- Do not document Storybook or Playwright as available until the scripts and config are actually added.

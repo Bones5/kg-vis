@@ -28,7 +28,7 @@ type Story = StoryObj<typeof meta>;
 
 export const OverviewToRingInteractive: Story = {};
 
-function BrokenGraph() {
+function BrokenGraph(): JSX.Element {
   throw new Error("Composed view failed");
 }
 

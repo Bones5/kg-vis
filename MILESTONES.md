@@ -14,67 +14,76 @@
 | Progress tracking | 🟡 Scaffolded | Hook/store/component placeholders exist |
 | Clustering controls | 🟡 Scaffolded | Hook/panel/type placeholders exist |
 | Metrics overlay | 🟡 Scaffolded | Hook/panel/type placeholders exist |
-| Storybook | ⚪ Not started | No config, scripts, or stories yet |
-| Playwright | ⚪ Not started | No config, scripts, or tests yet |
+| Storybook | ✅ Done | Storybook config, scripts, primitive stories, and composed stories are implemented |
+| Playwright | ✅ Done | Playwright config, scripts, desktop/tablet journeys, and keyboard accessibility checks are implemented |
 
-## Storybook plan
+## Storybook implementation
 
-### Phase 1: foundation
+### Completed foundation
 
-- Add Storybook for the Vite app.
-- Add `storybook` and `build-storybook` scripts.
-- Configure shared CSS and the `@/` alias inside Storybook.
+- Storybook is configured for the Vite app in `.storybook/main.ts` and `.storybook/preview.ts`.
+- `storybook` and `build-storybook` scripts are available in `package.json`.
+- Shared CSS and the `@/` alias are configured for Storybook usage.
 
-### Phase 2: primitive coverage
+### Completed primitive coverage
 
-- Add stories for:
-  - `HexPill`
-  - `Minimap`
-  - `RoutedEdges`
-  - `GraphErrorBoundary`
-- Capture hover, active, dimmed, and keyboard-focus states where practical.
+Stories are implemented for:
 
-### Phase 3: composed graph states
+- `HexPill`
+- `Minimap`
+- `RoutedEdges`
+- `GraphErrorBoundary`
 
-- Add deterministic stories for:
-  - overview mode
-  - cluster ring mode
-  - overflow stub state
-  - error fallback state
-- Reuse `generateMockGraph()` for reproducible story data.
+State coverage includes hover/selected/dimmed and empty/error variants where relevant.
 
-### Definition of done
+### Completed composed coverage
 
-- Storybook runs locally.
-- Static Storybook can be built in CI.
-- Core graph UI states are visible without launching the whole app manually.
+Deterministic stories are implemented for:
 
-## Playwright plan
+- `HexOverview`
+- `HexRing` (including an overflow-stub scenario)
+- `HexGraphView` (interactive overview→ring plus error state)
 
-### Phase 1: harness
+All stories reuse deterministic mock graph generation from `generateMockGraph()`.
 
-- Add Playwright config and scripts.
-- Start the Vite app in test mode against the deterministic mock data flow.
+## Playwright implementation
 
-### Phase 2: core journeys
+### Completed harness
 
-- Verify the app loads successfully.
-- Verify a cluster can be opened from the overview.
-- Verify breadcrumbs return to the overview.
-- Verify minimap navigation changes the active cluster.
-- Verify overflow stubs are keyboard accessible.
+- Playwright config is implemented in `playwright.config.ts`.
+- `test:e2e` script is available in `package.json`.
+- Tests run against a local Vite server with deterministic mock data flow.
 
-### Phase 3: responsive and regression coverage
+### Completed core journeys
 
-- Add desktop and tablet viewport coverage.
-- Add assertions around the presence of breadcrumbs, minimap, and selected center node.
-- If Storybook is adopted first, add a small set of component-driven Playwright checks against Storybook stories.
+End-to-end coverage in `e2e/graph-navigation.spec.ts` includes:
 
-### Definition of done
+- app load and overview render
+- cluster drill-in from overview
+- breadcrumb return to overview
+- minimap navigation while drilled in
+- keyboard activation path for overflow stubs (executed when overflow stubs are present)
 
-- Core navigation journeys are covered in CI.
-- Tests are deterministic and do not depend on live APIs.
-- Failures clearly separate app-regression issues from fixture/setup issues.
+### Completed responsive coverage
+
+- Desktop project viewport: `1280x800`
+- Tablet project viewport: `1024x768`
+
+Assertions include breadcrumbs, minimap visibility in drill-in mode, and center Rive node presence.
+
+## Definition of done check
+
+### Storybook
+
+- ✅ Storybook runs locally (`npm run storybook`)
+- ✅ Static Storybook builds (`npm run build-storybook`)
+- ✅ Core graph UI states are available as stories
+
+### Playwright
+
+- ✅ Core navigation journeys are automated (`npm run test:e2e`)
+- ✅ Tests are deterministic and avoid live APIs
+- ✅ Failures separate setup/config issues from journey regressions via explicit assertions
 
 ## Hosted development recommendation
 
