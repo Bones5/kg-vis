@@ -1,7 +1,6 @@
 import { useRef, useMemo } from "react";
 import { GraphNode } from "@/shared/types/graph";
 import { RiveNode } from "./RiveNode";
-import { useGraphView } from "../hooks/useGraphView";
 
 const POOL_SIZE = 20;
 
@@ -17,8 +16,6 @@ interface Props {
  * Nodes beyond the pool size are rendered as plain divs (no Rive animation).
  */
 export function RivePool({ nodes, hovered, selected }: Props) {
-  const { lastExpanded } = useGraphView();
-
   // Stable list of pool slots so Rive instances aren't recreated on every render
   const poolSlots = useRef<string[]>(Array.from({ length: POOL_SIZE }, (_, i) => `pool-${i}`));
 
@@ -36,7 +33,7 @@ export function RivePool({ nodes, hovered, selected }: Props) {
       {assigned.map(({ node, slotId }) => (
         <div
           key={slotId}
-          className={`rive-wrap${lastExpanded === node.id ? " expand" : ""}`}
+          className="rive-wrap"
         >
           <RiveNode
             node={node}

@@ -1,4 +1,4 @@
-import { GraphView } from "@/features/graph/components/GraphView";
+import { HexGraphView } from "@/features/hex/components/HexGraphView";
 import { useGraphData } from "@/features/graph/hooks/useGraphData";
 
 export function App() {
@@ -24,7 +24,7 @@ export function App() {
 
   return (
     <div className="app">
-      <GraphView payload={payload} />
+      <HexGraphView payload={payload} />
     </div>
   );
 }

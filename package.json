@@ -11,9 +11,9 @@
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-force-graph-2d": "^1.27.0",
     "@rive-app/react-canvas": "^4.15.7",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.5",
+    "d3-zoom": "^3.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
