@@ -13,6 +13,10 @@ A React + TypeScript knowledge graph visualizer using **force-graph 2D canvas** 
 | Graph Rendering | react-force-graph-2d (2D canvas) |
 | Animated Overlays | @rive-app/react-canvas |
 | State Management | Zustand |
+| Linting | ESLint |
+| Unit Testing | Vitest |
+| Component Explorer | Storybook |
+| E2E Testing | Playwright |
 
 ---
 
@@ -23,6 +27,19 @@ npm install
 npm run dev      # starts dev server at http://localhost:5173
 npm run build    # production build to dist/
 npm run preview  # preview production build locally
+```
+
+---
+
+## Development Tooling
+
+```bash
+npm run lint          # lint TypeScript/React source
+npm run test          # run unit tests once (Vitest)
+npm run test:watch    # run Vitest in watch mode
+npm run storybook     # run Storybook at http://localhost:6006
+npm run build-storybook
+npm run test:e2e      # run Playwright end-to-end tests
 ```
 
 ---
@@ -78,6 +95,15 @@ src/
   dev/
     mockGraph.ts        # generateMockGraph(options) — deterministic mock data
   main.tsx              # Entry point
+tests/
+  e2e/
+    app.spec.ts         # Playwright smoke test
+.storybook/
+  main.ts               # Storybook config
+  preview.ts            # Storybook preview globals
+.github/
+  workflows/ci.yml      # CI (lint, unit, build, storybook, e2e)
+  copilot-instructions.md
 ```
 
 ---
