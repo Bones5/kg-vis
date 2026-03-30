@@ -1,3 +1,10 @@
+/* ─── Rive node (used in ring center) ───────────────────────── */
+.rive-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
 /* ─── Hex pill shape ─────────────────────────────────────────── */
 .hex-pill {
   position: absolute;

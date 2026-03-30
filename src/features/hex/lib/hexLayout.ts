@@ -160,13 +160,39 @@ export function layoutRing(
     }
   };
 
-  placeInRing(visible.slice(0, innerCount), 1, "inner", INNER_SLOTS);
-  placeInRing(visible.slice(innerCount, innerCount + middleCount), 2, "middle", MIDDLE_SLOTS);
-  placeInRing(visible.slice(innerCount + middleCount), 3, "outer", OUTER_SLOTS);
+  const totalVisible = visible.length;
+  const innerVisible = Math.min(innerCount, INNER_SLOTS, totalVisible);
+  const remainingAfterInner = totalVisible - innerVisible;
+  const middleVisible = Math.min(middleCount, MIDDLE_SLOTS, remainingAfterInner);
+  const remainingAfterMiddle = totalVisible - innerVisible - middleVisible;
+  const outerVisible = Math.min(OUTER_SLOTS, remainingAfterMiddle);
+
+  placeInRing(visible.slice(0, innerVisible), 1, "inner", INNER_SLOTS);
+  placeInRing(
+    visible.slice(innerVisible, innerVisible + middleVisible),
+    2,
+    "middle",
+    MIDDLE_SLOTS
+  );
+  placeInRing(
+    visible.slice(
+      innerVisible + middleVisible,
+      innerVisible + middleVisible + outerVisible
+    ),
+    3,
+    "outer",
+    OUTER_SLOTS
+  );
+
+  const placedCount = innerVisible + middleVisible + outerVisible;
+  const extendedOverflow = [
+    ...overflow,
+    ...visible.slice(placedCount),
+  ];
 
   // Off-map stubs for overflow neighbors
-  const offMap: OffMapStub[] = overflow.map((item, idx) => {
-    const count = overflow.length;
+  const offMap: OffMapStub[] = extendedOverflow.map((item, idx) => {
+    const count = extendedOverflow.length;
     const angle = count > 1
       ? ((idx / count) * 2 * Math.PI) - Math.PI / 2
       : -Math.PI / 2;

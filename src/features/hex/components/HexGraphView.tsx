@@ -16,10 +16,6 @@ const OVERVIEW_H = 700;
 const OVERVIEW_OFFSET_X = OVERVIEW_W / 2;
 const OVERVIEW_OFFSET_Y = OVERVIEW_H / 2;
 
-interface Props {
-  payload: GraphPayload;
-}
-
 export function HexGraphView({ payload }: Props) {
   const [mode, setMode] = useState<ViewMode>("overview");
   const [activeCluster, setActiveCluster] = useState<string | null>(null);

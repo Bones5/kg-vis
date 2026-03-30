@@ -33,10 +33,10 @@ export function HexRing({ centerId, payload, onClusterClick }: Props) {
   const level0 = payload.levels["0"] ?? payload.levels[Object.keys(payload.levels)[0]];
 
   const routedEdges = useMemo(() => {
+    const ids = new Set(allNodes.map((n) => n.id));
     const allEdges = level0.edges.filter((e) => {
       const src = e.source as string;
       const tgt = e.target as string;
-      const ids = new Set(allNodes.map((n) => n.id));
       return ids.has(src) && ids.has(tgt);
     });
     return routeEdges(allNodes, allEdges, contactPairs);
@@ -81,25 +81,14 @@ export function HexRing({ centerId, payload, onClusterClick }: Props) {
         offsetY={OFFSET_Y}
       />
 
-      {/* Center node with Rive */}
-      <div
-        style={{
-          position: "absolute",
-          left: center.px + OFFSET_X - 56,
-          top: center.py + OFFSET_Y - 56,
-          width: 112,
-          height: 112,
-          zIndex: 2,
-        }}
-      >
-        <RiveNode
-          node={centerNode}
-          hovered={hoveredId === center.id}
-          selected={true}
-          size={112}
-          metric={center.importance}
-        />
-      </div>
+      {/* Center node with Rive — positioned via .rive-node CSS */}
+      <RiveNode
+        node={centerNode}
+        hovered={hoveredId === center.id}
+        selected={true}
+        size={112}
+        metric={center.importance}
+      />
 
       {/* Ring nodes */}
       {rings.map((node) => {

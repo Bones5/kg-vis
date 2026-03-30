@@ -1,4 +1,4 @@
-import { memo, KeyboardEvent } from "react";
+import { memo, KeyboardEvent, type CSSProperties } from "react";
 import type { HexNode, RingTier } from "@/shared/types/hex";
 import { importanceToColor } from "@/shared/lib/colors";
 
@@ -56,9 +56,11 @@ export const HexPill = memo(function HexPill({
         width: HEX_WIDTH,
         height: HEX_HEIGHT,
         "--hex-color": color,
-      } as React.CSSProperties}
+      } as CSSProperties & { "--hex-color": string }}
       onMouseEnter={() => onHover(node.id)}
       onMouseLeave={() => onHover(null)}
+      onFocus={() => onHover(node.id)}
+      onBlur={() => onHover(null)}
       onClick={() => onClick(node.id)}
       onKeyDown={handleKeyDown}
     >
