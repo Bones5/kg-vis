@@ -10,6 +10,9 @@ concurrency:
   group: chromatic-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   chromatic:
     name: Visual Review
@@ -26,7 +29,7 @@ jobs:
 
       - run: npm ci
 
-      - uses: chromaui/action@latest
+      - uses: chromaui/action@v11
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           exitZeroOnChanges: true
