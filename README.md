@@ -28,7 +28,7 @@ npm run build
 npm run preview
 ```
 
-At the moment the repository does **not** yet ship dedicated lint, unit test, Storybook, or Playwright scripts. Those are part of the next phase documented in [`/home/runner/work/kg-vis/kg-vis/MILESTONES.md`](./MILESTONES.md).
+At the moment the repository does **not** yet ship dedicated lint, unit test, Storybook, or Playwright scripts. Those are part of the next phase documented in [`MILESTONES.md`](./MILESTONES.md).
 
 ## What is implemented now
 
