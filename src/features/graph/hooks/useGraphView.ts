@@ -8,6 +8,7 @@ interface GraphViewState {
   setLevel: (level: number) => void;
   toggleCluster: (id: string) => void;
   setMaxNodes: (n: number) => void;
+  resetView: () => void;
 }
 
 export const useGraphView = create<GraphViewState>((set, get) => ({
@@ -22,4 +23,6 @@ export const useGraphView = create<GraphViewState>((set, get) => ({
     set({ expandedClusters: s, lastExpanded: id });
   },
   setMaxNodes: (n) => set({ maxNodes: n }),
+  resetView: () =>
+    set({ level: 0, expandedClusters: new Set<string>(), lastExpanded: undefined }),
 }));

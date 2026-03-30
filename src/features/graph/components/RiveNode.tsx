@@ -31,7 +31,8 @@ export function RiveNode({ node, hovered = false, selected = false, size = 40, m
     <div
       className="rive-node"
       style={{
-        transform: `translate(${node.x}px, ${node.y}px)`,
+        left: node.x,
+        top: node.y,
         width: size,
         height: size,
       }}

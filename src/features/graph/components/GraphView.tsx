@@ -1,10 +1,12 @@
+import { useEffect } from "react";
 import { GraphPayload } from "@/shared/types/graph";
 import { GraphCanvas } from "./GraphCanvas";
 import { GraphOverlayRive } from "./GraphOverlayRive";
 import { GraphControls } from "./GraphControls";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { GraphErrorBoundary } from "./GraphErrorBoundary";
-import "@/styles/graph.css";
+import { useGraphView } from "../hooks/useGraphView";
+import { useDevice } from "@/shared/hooks/useDevice";
 
 interface Props {
   payload: GraphPayload;
@@ -12,6 +14,12 @@ interface Props {
 
 export function GraphView({ payload }: Props) {
   const levels = payload.meta.levels;
+  const { maxNodes: deviceMaxNodes } = useDevice();
+  const { setMaxNodes } = useGraphView();
+
+  useEffect(() => {
+    setMaxNodes(deviceMaxNodes);
+  }, [deviceMaxNodes, setMaxNodes]);
 
   return (
     <div className="graph-view">

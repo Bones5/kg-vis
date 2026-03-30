@@ -1,4 +1,4 @@
-import { useMemo, Component, ReactNode, ErrorInfo } from "react";
+import { useMemo } from "react";
 import { GraphPayload, GraphNode } from "@/shared/types/graph";
 import { useGraphView } from "../hooks/useGraphView";
 import { useGraphUI } from "../hooks/useGraphUI";
@@ -7,23 +7,6 @@ import { RivePool } from "./RivePool";
 
 interface Props {
   payload: GraphPayload;
-}
-
-class RiveErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
-  constructor(props: { children: ReactNode }) {
-    super(props);
-    this.state = { hasError: false };
-  }
-  static getDerivedStateFromError(): { hasError: boolean } {
-    return { hasError: true };
-  }
-  componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error("[RiveErrorBoundary]", error, info.componentStack);
-  }
-  render() {
-    if (this.state.hasError) return null;
-    return this.props.children;
-  }
 }
 
 export function GraphOverlayRive({ payload }: Props) {
@@ -50,9 +33,7 @@ export function GraphOverlayRive({ payload }: Props) {
 
   return (
     <div className={`rive-overlay${lastExpanded ? " has-expansion" : ""}`}>
-      <RiveErrorBoundary>
-        <RivePool nodes={overlayNodes} hovered={hovered} selected={selected} />
-      </RiveErrorBoundary>
+      <RivePool nodes={overlayNodes} hovered={hovered} selected={selected} />
     </div>
   );
 }

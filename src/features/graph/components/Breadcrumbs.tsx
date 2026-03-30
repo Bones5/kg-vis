@@ -10,8 +10,8 @@ interface Props {
 }
 
 /**
- * Show the cluster expansion path: All → Food → Fruit → Citrus
- * Clicking an item collapses back to that level.
+ * Show the cluster expansion path, for example: All → Food → Fruit → Citrus.
+ * Clicking an item toggles navigation to that cluster in the graph view.
  */
 export function Breadcrumbs({ items = [] }: Props) {
   const { toggleCluster } = useGraphView();

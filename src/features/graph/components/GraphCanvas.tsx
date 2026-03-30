@@ -1,7 +1,8 @@
 import ForceGraph2D, { NodeObject, LinkObject } from "react-force-graph-2d";
 import { useMemo, useCallback } from "react";
-import { GraphPayload, GraphNode } from "@/shared/types/graph";
+import { GraphPayload, GraphNode, GraphEdge } from "@/shared/types/graph";
 import { buildView } from "../lib/graphTransforms";
+import { expand } from "../lib/clustering";
 import { useGraphView } from "../hooks/useGraphView";
 import { useGraphUI } from "../hooks/useGraphUI";
 import { CLUSTER_COLOR, WORD_COLOR, HOVERED_COLOR, SELECTED_COLOR, EDGE_COLOR } from "@/shared/lib/colors";
@@ -11,14 +12,47 @@ interface Props {
 }
 
 export function GraphCanvas({ payload }: Props) {
-  const { level, maxNodes } = useGraphView();
+  const { level, maxNodes, expandedClusters } = useGraphView();
   const { setHovered, setSelected, hovered, selected } = useGraphUI();
 
   const view = useMemo(() => {
     const lvl = payload.levels[String(level)];
     if (!lvl) return { nodes: [], edges: [] };
-    return buildView(lvl, maxNodes);
-  }, [payload, level, maxNodes]);
+    const baseView = buildView(lvl, maxNodes);
+
+    if (expandedClusters.size === 0) return baseView;
+
+    // Merge expanded cluster word nodes into the base view
+    const nodeMap = new Map<string, GraphNode>(baseView.nodes.map((n) => [n.id, n]));
+    let remainingBudget = maxNodes - baseView.nodes.length;
+
+    for (const clusterId of expandedClusters) {
+      if (remainingBudget <= 0) break;
+      const expanded = expand(clusterId, payload, remainingBudget);
+      for (const node of expanded) {
+        if (!nodeMap.has(node.id)) {
+          const pinned = { ...node, fx: node.x, fy: node.y };
+          nodeMap.set(node.id, pinned);
+          remainingBudget--;
+        }
+      }
+    }
+
+    const mergedNodes = Array.from(nodeMap.values());
+    const visibleIds = new Set(mergedNodes.map((n) => n.id));
+
+    // Pull edges from all levels to cover expanded nodes
+    const allEdges: GraphEdge[] = [];
+    for (const lvlData of Object.values(payload.levels)) {
+      for (const e of lvlData.edges) {
+        if (visibleIds.has(e.source as string) && visibleIds.has(e.target as string)) {
+          allEdges.push({ ...e });
+        }
+      }
+    }
+
+    return { nodes: mergedNodes, edges: allEdges };
+  }, [payload, level, maxNodes, expandedClusters]);
 
   const handleNodeHover = useCallback(
     (node: NodeObject | null) => {

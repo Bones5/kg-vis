@@ -6,8 +6,10 @@ interface Props {
 }
 
 export function GraphControls({ maxLevel = 2 }: Props) {
-  const { level, setLevel, expandedClusters, toggleCluster } = useGraphView();
+  const { level, setLevel, expandedClusters, toggleCluster, resetView } = useGraphView();
   const { selected, setSelected } = useGraphUI();
+
+  const canExpand = level < maxLevel || selected?.type === "cluster";
 
   const handleExpand = () => {
     if (selected?.type === "cluster") {
@@ -26,7 +28,7 @@ export function GraphControls({ maxLevel = 2 }: Props) {
   };
 
   const handleReset = () => {
-    setLevel(0);
+    resetView();
     setSelected(undefined);
   };
 
@@ -43,7 +45,7 @@ export function GraphControls({ maxLevel = 2 }: Props) {
       <button
         className="ctrl-btn"
         onClick={handleExpand}
-        disabled={level >= maxLevel && !selected}
+        disabled={!canExpand}
         title="Expand"
       >
         Expand ▶

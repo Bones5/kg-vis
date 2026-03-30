@@ -52,7 +52,8 @@ export function RivePool({ nodes, hovered, selected }: Props) {
           key={node.id}
           className="rive-node rive-node--fallback"
           style={{
-            transform: `translate(${node.x}px, ${node.y}px)`,
+            left: node.x,
+            top: node.y,
             width: node.type === "cluster" ? 56 : 40,
             height: node.type === "cluster" ? 56 : 40,
           }}
