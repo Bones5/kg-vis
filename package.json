@@ -6,20 +6,31 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@rive-app/react-canvas": "^4.15.7",
+    "d3-zoom": "^3.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "@rive-app/react-canvas": "^4.15.7",
-    "zustand": "^4.5.5",
-    "d3-zoom": "^3.0.0"
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@storybook/addon-docs": "^10.3.3",
+    "@storybook/addon-onboarding": "^10.3.3",
+    "@storybook/react-vite": "^10.3.3",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "storybook": "^10.3.3",
     "typescript": "^5.5.3",
     "vite": "^5.3.4"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   }
 }
