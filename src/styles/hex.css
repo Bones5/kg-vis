@@ -1,0 +1,225 @@
+/* ─── Hex pill shape ─────────────────────────────────────────── */
+.hex-pill {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  clip-path: polygon(
+    25% 0%,
+    75% 0%,
+    100% 50%,
+    75% 100%,
+    25% 100%,
+    0% 50%
+  );
+  background: var(--hex-color, #6366f1);
+  color: #fff;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+  padding: 8px 12px;
+  overflow: hidden;
+}
+
+/* ─── Tier variants ──────────────────────────────────────────── */
+.hex-pill--inner {
+  font-weight: 700;
+  font-size: 0.8rem;
+  opacity: 1;
+}
+
+.hex-pill--middle {
+  font-weight: 500;
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.hex-pill--outer {
+  font-weight: 400;
+  font-size: 0.7rem;
+  opacity: 0.75;
+}
+
+/* ─── Interaction states ─────────────────────────────────────── */
+.hex-pill--hovered {
+  transform: scale(1.12);
+  filter: brightness(1.15);
+  z-index: 10;
+}
+
+.hex-pill--selected {
+  transform: scale(1.1);
+  outline: 2px solid #10b981;
+  outline-offset: 3px;
+  z-index: 9;
+}
+
+.hex-pill--dimmed {
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+/* ─── Inner elements ─────────────────────────────────────────── */
+.hex-pill__label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 72px;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1.2;
+}
+
+.hex-pill__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 9999px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  line-height: 1.4;
+  min-width: 18px;
+}
+
+.hex-pill__strength-bar {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 2px;
+  max-width: 64px;
+  align-self: center;
+  margin-top: 2px;
+}
+
+/* ─── Top-level view layout ──────────────────────────────────── */
+.hex-graph-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-family: system-ui, sans-serif;
+  overflow: hidden;
+}
+
+.hex-canvas-wrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ─── Overview & ring containers ─────────────────────────────── */
+.hex-overview,
+.hex-ring {
+  position: relative;
+}
+
+/* ─── Routed edges SVG overlay ───────────────────────────────── */
+.routed-edges {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* ─── Minimap ────────────────────────────────────────────────── */
+.minimap {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 120px;
+  height: 120px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid #334155;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.minimap__dot {
+  fill: #6366f1;
+  transition: r 0.15s ease, fill 0.15s ease;
+}
+
+.minimap__dot--active {
+  fill: #10b981;
+  filter: drop-shadow(0 0 4px #10b981);
+}
+
+/* ─── Off-map stubs ──────────────────────────────────────────── */
+.hex-ring__stub {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #475569;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.hex-ring__stub:hover,
+.hex-ring__stub:focus {
+  color: #e2e8f0;
+  border-color: #6366f1;
+  outline: none;
+}
+
+.hex-ring__stub-arrow {
+  font-size: 0.9rem;
+}
+
+.hex-ring__stub-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+/* ─── Breadcrumbs ────────────────────────────────────────────── */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: #0f172a;
+  border-bottom: 1px solid #1e293b;
+  flex-shrink: 0;
+}
+
+.breadcrumbs__item {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.breadcrumbs__item:hover {
+  color: #e2e8f0;
+  background: #1e293b;
+}
+
+.breadcrumbs__item--active {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.breadcrumbs__sep {
+  color: #334155;
+  font-size: 1rem;
+}
