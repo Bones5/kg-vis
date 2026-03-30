@@ -9,8 +9,8 @@ const config: StorybookConfig = {
     name: "@storybook/react-vite",
     options: {},
   },
-  viteFinal: async (config) => {
-    return mergeConfig(config, {
+  viteFinal: async (viteConfig) => {
+    return mergeConfig(viteConfig, {
       resolve: {
         alias: {
           "@": fileURLToPath(new URL("../src", import.meta.url)),

@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+const OVERFLOW_FIXTURE_CLUSTER_COUNT = 200;
+const OVERFLOW_FIXTURE_NODES_PER_CLUSTER = 1;
+const OVERFLOW_FIXTURE_EDGE_DENSITY = 1;
+
 test.describe("hex graph journeys", () => {
   test("app loads and shows overview", async ({ page }) => {
     await page.goto("/");
@@ -37,15 +41,13 @@ test.describe("hex graph journeys", () => {
   });
 
   test("overflow stub supports keyboard activation", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(`/?mockClusterCount=${OVERFLOW_FIXTURE_CLUSTER_COUNT}&mockNodesPerCluster=${OVERFLOW_FIXTURE_NODES_PER_CLUSTER}&mockEdgeDensity=${OVERFLOW_FIXTURE_EDGE_DENSITY}`);
 
     await page.locator(".hex-overview .hex-pill").first().click();
     await expect(page.locator(".hex-ring")).toBeVisible();
 
     const stub = page.locator(".hex-ring__stub").first();
-    if ((await stub.count()) === 0) {
-      test.skip(true, "No overflow stubs for current deterministic dataset");
-    }
+    await expect(stub).toBeVisible();
 
     const before = await page.locator(".breadcrumbs__item--active").last().textContent();
     await stub.focus();

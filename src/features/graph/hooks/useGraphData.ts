@@ -8,6 +8,19 @@ interface UseGraphDataResult {
   error: string | null;
 }
 
+function parsePositiveInt(raw: string | null, fallback: number): number {
+  if (!raw) return fallback;
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parseDensity(raw: string | null, fallback: number): number {
+  if (!raw) return fallback;
+  const parsed = Number.parseFloat(raw);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(1, Math.max(0, parsed));
+}
+
 export function useGraphData(): UseGraphDataResult {
   const [payload, setPayload] = useState<GraphPayload | null>(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +29,13 @@ export function useGraphData(): UseGraphDataResult {
   useEffect(() => {
     // In dev/demo mode, use mock data. In production, fetch from server.
     try {
-      const mock = generateMockGraph({ clusterCount: 8, nodesPerCluster: 50, edgeDensity: 0.3 });
+      const search = typeof window !== "undefined" ? window.location.search : "";
+      const params = new URLSearchParams(search);
+      const mock = generateMockGraph({
+        clusterCount: parsePositiveInt(params.get("mockClusterCount"), 8),
+        nodesPerCluster: parsePositiveInt(params.get("mockNodesPerCluster"), 50),
+        edgeDensity: parseDensity(params.get("mockEdgeDensity"), 0.3),
+      });
       setPayload(mock);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error loading graph");
