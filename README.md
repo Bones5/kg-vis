@@ -17,7 +17,7 @@ KG-Vis is a React + TypeScript prototype for exploring a knowledge graph as a he
 | Bundler | Vite |
 | State/data loading | React hooks + deterministic mock data |
 | Animation | `@rive-app/react-canvas` |
-| Styling | CSS modules-by-feature via `src/styles/*.css` |
+| Styling | Plain CSS loaded from `src/styles/*.css` |
 
 ## Current scripts
 
