@@ -1,159 +1,169 @@
 # KG-Vis — Knowledge Graph Visualizer
 
-A React + TypeScript knowledge graph visualizer using **force-graph 2D canvas** with **Rive animated overlays**. Data is pre-positioned and server-prepared. Targets desktop, iPad, and mobile.
+KG-Vis is a React + TypeScript prototype for exploring a knowledge graph as a hex-based cluster map. The current experience has moved away from the original force-graph-first concept and now centers on:
 
----
+- a deterministic mock graph data source
+- a hex overview that lays clusters out on a honeycomb grid
+- routed cluster-to-cluster edges
+- drill-in ring views for a selected cluster
+- a minimap and breadcrumb navigation
+- a Rive-driven animated center node in the ring view
 
-## Tech Stack
+## Current stack
 
-| Layer | Library |
-|---|---|
-| UI Framework | React 18 + TypeScript |
-| Build Tool | Vite |
-| Graph Rendering | react-force-graph-2d (2D canvas) |
-| Animated Overlays | @rive-app/react-canvas |
-| State Management | Zustand |
+| Layer | Technology |
+| --- | --- |
+| UI | React 18 + TypeScript |
+| Bundler | Vite |
+| State/data loading | React hooks + deterministic mock data |
+| Animation | `@rive-app/react-canvas` |
+| Styling | Plain CSS loaded from `src/styles/*.css` |
 
----
-
-## Quick Start
+## Current scripts
 
 ```bash
 npm install
-npm run dev      # starts dev server at http://localhost:5173
-npm run build    # production build to dist/
-npm run preview  # preview production build locally
+npm run dev
+npm run build
+npm run preview
 ```
 
----
+At the moment the repository does **not** yet ship dedicated lint, unit test, Storybook, or Playwright scripts. Those are part of the next phase documented in [`MILESTONES.md`](./MILESTONES.md).
 
-## Project Structure
+## What is implemented now
 
-```
+### Graph experience
+
+- `App` loads graph data through `useGraphData`
+- `useGraphData` currently serves deterministic mock data from `src/dev/mockGraph.ts`
+- `HexGraphView` switches between:
+  - **overview** mode for all clusters
+  - **cluster-ring** mode for a selected cluster
+- `HexOverview` lays out clusters in hex rings and renders routed edges
+- `HexRing` shows the selected cluster at the center, surrounding neighbor clusters in tiers, and off-map stub navigation for overflow
+- `Minimap` supports quick navigation while drilled in
+- `GraphErrorBoundary` protects the main visualization shell
+
+### Data model
+
+The graph payload is still multi-level:
+
+- level `0`: cluster-to-cluster overview
+- level `1`: clusters plus top words
+- level `2`: full graph payload
+
+That structure lets the current UI use level `0` for navigation while preserving room for deeper milestone work.
+
+## Project structure
+
+```text
 src/
   app/
-    App.tsx             # Root component with loading/error states
-    routes.tsx          # Future routing config (placeholder)
-    store.ts            # Re-exports all Zustand stores
+    App.tsx
+    routes.tsx
+    store.ts
+  dev/
+    mockGraph.ts
   features/
     graph/
       components/
-        GraphCanvas.tsx         # react-force-graph-2d canvas, pre-positioned
-        GraphOverlayRive.tsx    # Rive overlay layer (clusters + hovered/selected)
-        RiveNode.tsx            # Single Rive instance with SM inputs
-        RivePool.tsx            # Fixed pool (20) of Rive instances, recycled
-        GraphControls.tsx       # Expand / Collapse / Reset buttons
-        GraphView.tsx           # Composes canvas + overlay + controls + breadcrumbs
-        Breadcrumbs.tsx         # Expansion path nav (All → Food → Fruit)
-        GraphErrorBoundary.tsx  # Error boundary for canvas/overlay
+        GraphErrorBoundary.tsx
+        RiveNode.tsx
+        RivePool.tsx
       hooks/
-        useGraphView.ts         # Zustand: level, expandedClusters, maxNodes
-        useGraphUI.ts           # Zustand: hovered, selected nodes
-        useGraphData.ts         # Loads graph payload (mock or server)
+        useGraphData.ts
+        useGraphUI.ts
+    hex/
+      components/
+        HexGraphView.tsx
+        HexOverview.tsx
+        HexRing.tsx
+        HexPill.tsx
+        Minimap.tsx
+        RoutedEdges.tsx
       lib/
-        graphTransforms.ts      # buildView(level, maxNodes) — top-K + clusters
-        clustering.ts           # expand(clusterId, payload, maxNodes)
-      types.ts                  # Re-exports from shared/types/graph
-    search/             # Milestone 5 (placeholder)
-    filters/            # Milestone 6 (placeholder)
-    progress/           # Milestone 7 (placeholder)
-    clustering/         # Milestone 8 (placeholder)
-    metrics/            # Milestone 9 (placeholder)
+        edgeRouter.ts
+        hexLayout.ts
+        hexMath.ts
+    search/
+    filters/
+    progress/
+    clustering/
+    metrics/
   shared/
-    components/         # Button, Toggle, Slider, Tooltip, Modal (placeholders)
+    components/
     hooks/
-      useDevice.ts      # Reactive device-aware node budget
-      useDebounce.ts    # Generic debounce hook
-      useLocalStorage.ts # Typed localStorage hook
     lib/
-      api.ts            # fetchGraphPayload utility
-      device.ts         # getNodeBudget / getDeviceBudget
-      colors.ts         # Node/edge color constants + importanceToColor
     types/
-      graph.ts          # GraphNode, GraphEdge, GraphLevel, GraphPayload
-      ui.ts             # DeviceBudget, DeviceClass
   styles/
-    global.css          # Reset + app shell styles
-    graph.css           # Graph view, overlay, breadcrumbs, controls, animations
-  dev/
-    mockGraph.ts        # generateMockGraph(options) — deterministic mock data
-  main.tsx              # Entry point
+    global.css
+    hex.css
 ```
 
----
+## Milestone snapshot
 
-## Data Schema
+| Milestone | Status | Notes |
+| --- | --- | --- |
+| Mock graph generation | ✅ | Deterministic demo payload is in place |
+| Hex overview layout | ✅ | Cluster overview and routed edges are implemented |
+| Drill-in navigation | ✅ | Breadcrumbs, ring layout, minimap, and overflow stubs are in place |
+| Rive integration | ✅ | Center-node animation is wired into the ring view |
+| Search | 🟡 | Stub hook/component files exist, but no UI behavior yet |
+| Filters | 🟡 | Stub hook/component files exist, but no filter logic yet |
+| Progress tracking | 🟡 | Stub APIs exist, but no persistence or panel yet |
+| Clustering controls | 🟡 | Placeholder hook/panel exist, but no behavior yet |
+| Metrics overlay | 🟡 | Placeholder hook/panel exist, but no behavior yet |
+| Storybook | ⚪ | Not started |
+| Playwright | ⚪ | Not started |
 
-Graph data follows a multi-level schema. Level 0 shows cluster nodes only; level 1 adds top-importance word nodes; level 2 shows all nodes.
+## Plan to flesh out Storybook and Playwright
 
-```json
-{
-  "meta": { "version": 1, "levels": 3 },
-  "levels": {
-    "0": {
-      "nodes": [{ "id": "C1", "type": "cluster", "label": "Food", "x": 10.5, "y": -4.2 }],
-      "edges": [{ "source": "C1", "target": "C2", "weight": 3 }]
-    },
-    "1": {
-      "nodes": ["...clusters...", "...top words..."],
-      "edges": ["..."]
-    },
-    "2": { "nodes": ["...all nodes..."], "edges": ["...all edges..."] }
-  }
-}
-```
+### Storybook
 
----
+1. Add Storybook for Vite and expose it through `npm` scripts.
+2. Start with stories for the stable UI primitives:
+   - `HexPill`
+   - `Minimap`
+   - `RoutedEdges`
+   - `GraphErrorBoundary`
+3. Add composite stories for:
+   - `HexOverview`
+   - `HexRing`
+   - `HexGraphView`
+4. Use the existing deterministic mock graph so stories stay reproducible.
+5. Add stories for hover, active, overflow, and empty/error states.
 
-## Device-Aware Node Budgets
+### Playwright
 
-| Screen Width | Max Nodes | Max Edges |
-|---|---|---|
-| ≥ 1200 px (desktop) | 4 000 | 12 000 |
-| ≥ 900 px (tablet landscape) | 2 500 | 7 500 |
-| ≥ 600 px (tablet portrait) | 1 500 | 4 500 |
-| < 600 px (mobile) | 800 | 2 400 |
+1. Add a smoke test for first load of the mock graph.
+2. Add interaction coverage for:
+   - drilling into a cluster
+   - returning via breadcrumbs
+   - minimap navigation
+   - keyboard activation on overflow stubs
+3. Add viewport coverage for desktop and tablet layouts.
+4. Keep tests deterministic by relying on mock data rather than a live backend.
+5. Once Storybook exists, consider component-level Playwright checks against Storybook stories for stable visual and interaction coverage.
 
----
+## Suggested hosted dev setup
 
-## Rive Integration
+For the next phase, the cleanest hosted workflow is:
 
-Rive animations live in `public/rive/cluster.riv` (not bundled with source). The `.riv` file must define a **State Machine** named `nodeSM` with the following inputs:
+- **Vercel** for the main app preview environment
+- **Chromatic** for hosted Storybook publishing, review links, and visual regression baselines
+- **GitHub Actions** for build/test automation once Storybook and Playwright are added
 
-| Input | Type | Description |
-|---|---|---|
-| `hovered` | Bool | Node is being hovered |
-| `selected` | Bool | Node is selected |
-| `size` | Number | Visual size of the node |
-| `metric` | Number | Importance / metric value (0–1) |
+Why this combination:
 
-### Overlay strategy
-- **Cluster nodes** always get a Rive instance
-- **Hovered / selected** word nodes also get Rive instances
-- A fixed **pool of 20** instances is pre-created and recycled
-- Nodes beyond the pool cap render as plain CSS circles (no perf cost)
+- Vercel gives fast preview deploys for the app shell with minimal setup.
+- Chromatic is purpose-built for Storybook hosting and review workflows.
+- GitHub Actions can run the same Storybook build and Playwright checks before merges.
 
----
+If you want a single-platform fallback, Netlify can host both the app preview and static Storybook build, but Chromatic remains the better Storybook-specific review experience.
 
-## Milestones
+## Notes for contributors
 
-| # | Status | Feature |
-|---|---|---|
-| 1 | ✅ | Mock data generator (`generateMockGraph`) |
-| 2 | ✅ | Graph rendering + pre-positioned nodes |
-| 3 | ✅ | Cluster expansion + Breadcrumbs + Controls |
-| 4 | ✅ | Rive overlay + instance pool |
-| 5 | 🔲 | Search (SearchBox, search index) |
-| 6 | 🔲 | Filters (FilterPanel, FilterChips, filter logic) |
-| 7 | 🔲 | Progress tracking (ProgressPanel, localStorage) |
-| 8 | 🔲 | Clustering config panel |
-| 9 | 🔲 | Metrics overlay (FPS, node/edge counts) |
-
----
-
-## Key Design Decisions
-
-- **Pre-positioned nodes**: `fx`/`fy` are set from `x`/`y` with `cooldownTicks={0}`, disabling the force simulation entirely for instant, stable layout.
-- **Never mutate source data**: `buildView` and `expand` always create new objects.
-- **Error boundaries**: `GraphErrorBoundary` wraps both the canvas and the Rive overlay layer.
-- **Zustand stores**: `useGraphView` (level/expansion state) and `useGraphUI` (hover/select) are independent stores to minimize re-renders.
+- Use the `@/` alias for imports from `src/`.
+- Keep feature work inside the existing feature-first structure.
+- Treat the mock graph generator as the default deterministic fixture source until a real backend contract is introduced.
+- Do not document Storybook or Playwright as available until the scripts and config are actually added.
