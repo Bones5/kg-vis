@@ -10,11 +10,11 @@ async function chromaticSnapshot(page: Page, name: string) {
   try {
     await takeSnapshot(page, name);
   } catch (error) {
-    // Swallow the known benign error when not running under `chromatic --playwright`,
-    // but surface any other failures so CI can detect snapshot issues.
+    // Swallow the known benign error when not running under `chromatic --playwright`.
+    // The library throws "Incorrect usage" in that scenario.
     if (
       error instanceof Error &&
-      /not running under chromatic --playwright/i.test(error.message)
+      /incorrect usage/i.test(error.message)
     ) {
       return;
     }
