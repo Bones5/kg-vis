@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { takeSnapshot } from "@chromatic-com/playwright";
 
 const OVERFLOW_FIXTURE_CLUSTER_COUNT = 200;
 const OVERFLOW_FIXTURE_NODES_PER_CLUSTER = 1;
@@ -11,6 +12,8 @@ test.describe("hex graph journeys", () => {
     await expect(page.getByRole("navigation", { name: "View navigation" })).toBeVisible();
     await expect(page.getByRole("button", { name: "All" })).toBeVisible();
     await expect(page.locator(".hex-overview")).toBeVisible();
+
+    await takeSnapshot(page, "Overview loaded");
   });
 
   test("cluster drill-in, breadcrumbs return, and minimap navigation", async ({ page }) => {
@@ -25,6 +28,8 @@ test.describe("hex graph journeys", () => {
     await expect(page.locator(".rive-node")).toBeVisible();
     await expect(page.getByText(firstLabel, { exact: true })).toBeVisible();
 
+    await takeSnapshot(page, "Cluster drill-in");
+
     const activeDotAria = page.locator(".minimap__dot--active").first().locator("xpath=.");
     await expect(activeDotAria).toHaveAttribute("aria-label", new RegExp(firstLabel));
 
@@ -35,9 +40,13 @@ test.describe("hex graph journeys", () => {
     await expect(page.locator(".hex-ring")).toBeVisible();
     await expect(page.locator(".minimap__dot--active").first()).toHaveAttribute("aria-label", secondDotLabel);
 
+    await takeSnapshot(page, "Minimap navigation");
+
     await page.getByRole("button", { name: "All" }).click();
     await expect(page.locator(".hex-overview")).toBeVisible();
     await expect(page.locator(".minimap")).toHaveCount(0);
+
+    await takeSnapshot(page, "Breadcrumb return to overview");
   });
 
   test("overflow stub supports keyboard activation", async ({ page }) => {
@@ -55,5 +64,7 @@ test.describe("hex graph journeys", () => {
 
     await expect(page.locator(".hex-ring")).toBeVisible();
     await expect(page.locator(".breadcrumbs__item--active").last()).not.toHaveText(before ?? "");
+
+    await takeSnapshot(page, "Overflow stub navigation");
   });
 });
