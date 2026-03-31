@@ -9,8 +9,20 @@ const OVERFLOW_FIXTURE_EDGE_DENSITY = 1;
 async function chromaticSnapshot(page: Page, name: string) {
   try {
     await takeSnapshot(page, name);
-  } catch {
-    // takeSnapshot only works under `chromatic --playwright`
+  } catch (error) {
+    // Swallow the known benign error when not running under `chromatic --playwright`,
+    // but surface any other failures so CI can detect snapshot issues.
+    if (
+      error instanceof Error &&
+      /not running under chromatic --playwright/i.test(error.message)
+    ) {
+      return;
+    }
+
+    // Log unexpected errors to aid debugging, then rethrow so the test fails.
+    // eslint-disable-next-line no-console
+    console.error("Chromatic snapshot failed:", error);
+    throw error;
   }
 }
 
