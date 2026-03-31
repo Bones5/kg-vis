@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "test": "vitest run",
     "test:e2e": "playwright test"
   },
   "dependencies": {
@@ -28,7 +29,8 @@
     "@vitejs/plugin-react": "^4.3.1",
     "storybook": "^10.3.3",
     "typescript": "^5.5.3",
-    "vite": "^5.3.4"
+    "vite": "^5.3.4",
+    "vitest": "^4.1.2"
   },
   "engines": {
     "node": ">=20.9.0"
