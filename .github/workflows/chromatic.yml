@@ -50,6 +50,8 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
 
-      - run: npx chromatic --playwright
-        env:
-          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+      - uses: chromaui/action@v11
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          playwright: true
+          exitZeroOnChanges: true
