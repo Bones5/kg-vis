@@ -1,0 +1,34 @@
+// ─── Theme palette ──────────────────────────────────────────
+// Source: https://coolors.co/031926-468189-77aca2-9dbebb-f4e9cd
+
+@use "sass:color";
+
+$rich-black: #031926;
+$teal-blue: #468189;
+$green-sheen: #77aca2;
+$opal: #9dbebb;
+$dutch-white: #f4e9cd;
+
+// Semantic aliases
+$bg-primary: $rich-black;
+$bg-surface: color.adjust($rich-black, $lightness: 6%);
+$bg-elevated: color.adjust($rich-black, $lightness: 10%);
+
+$accent-primary: $teal-blue;
+$accent-secondary: $green-sheen;
+$accent-muted: $opal;
+$text-primary: $dutch-white;
+$text-secondary: $opal;
+$text-muted: $green-sheen;
+
+$border-subtle: $teal-blue;
+$border-strong: $green-sheen;
+
+// Palette map for programmatic access
+$palette: (
+  "rich-black": $rich-black,
+  "teal-blue": $teal-blue,
+  "green-sheen": $green-sheen,
+  "opal": $opal,
+  "dutch-white": $dutch-white,
+);

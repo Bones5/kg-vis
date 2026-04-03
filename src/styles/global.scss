@@ -1,4 +1,5 @@
-@import './hex.css';
+@use "theme" as t;
+@use "./hex";
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -27,8 +28,8 @@ html, body, #root {
   justify-content: center;
   width: 100%;
   height: 100%;
-  background: #0f172a;
-  color: #94a3b8;
+  background: t.$bg-primary;
+  color: t.$text-secondary;
   font-family: system-ui, sans-serif;
   gap: 1rem;
 }
@@ -36,8 +37,8 @@ html, body, #root {
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #334155;
-  border-top-color: #6366f1;
+  border: 3px solid t.$border-subtle;
+  border-top-color: t.$accent-primary;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

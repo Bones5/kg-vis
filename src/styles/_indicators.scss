@@ -1,0 +1,17 @@
+// ─── Indicator palette ──────────────────────────────────────
+// Source: https://www.color-hex.com/color-palette/23357
+
+$error: #cc3300;
+$warning: #ff9966;
+$caution: #ffcc00;
+$success: #99cc33;
+$positive: #339900;
+
+// Indicator map for programmatic access
+$indicators: (
+  "error": $error,
+  "warning": $warning,
+  "caution": $caution,
+  "success": $success,
+  "positive": $positive,
+);

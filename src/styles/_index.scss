@@ -1,0 +1,6 @@
+// ─── Style barrel ───────────────────────────────────────────
+// Usage: @use '@/styles' as s;
+//   → s.$accent-primary, s.$error, etc.
+
+@forward "theme";
+@forward "indicators";
