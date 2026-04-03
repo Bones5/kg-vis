@@ -42,3 +42,29 @@ export const HoverConnected: Story = {
     hoveredId: nodes[0]?.id ?? null,
   },
 };
+
+export const NoEdges: Story = {
+  args: {
+    edges: [],
+    hoveredId: null,
+  },
+};
+
+export const SingleEdge: Story = {
+  args: {
+    edges: edges.slice(0, 1),
+    hoveredId: null,
+  },
+};
+
+const densePayload = generateMockGraph({ clusterCount: 12, nodesPerCluster: 10, edgeDensity: 0.4, interClusterDensity: 0.8 });
+const denseNodes = layoutOverview(densePayload);
+const denseLevel0 = densePayload.levels["0"];
+const denseEdges = routeEdges(denseNodes, denseLevel0.edges, computeContactPairs(denseNodes));
+
+export const DenseEdges: Story = {
+  args: {
+    edges: denseEdges,
+    hoveredId: null,
+  },
+};

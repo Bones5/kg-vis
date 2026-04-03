@@ -36,3 +36,23 @@ export const Empty: Story = {
     activeClusterId: null,
   },
 };
+
+const singlePayload = generateMockGraph({ clusterCount: 1, nodesPerCluster: 5, edgeDensity: 0.2 });
+const singleNodes = layoutOverview(singlePayload).map((n) => ({ ...n, px: n.px + 450, py: n.py + 350 }));
+
+export const SingleNode: Story = {
+  args: {
+    nodes: singleNodes,
+    activeClusterId: singleNodes[0]?.id ?? null,
+  },
+};
+
+const manyPayload = generateMockGraph({ clusterCount: 50, nodesPerCluster: 2, edgeDensity: 0.1 });
+const manyNodes = layoutOverview(manyPayload).map((n) => ({ ...n, px: n.px + 450, py: n.py + 350 }));
+
+export const ManyNodes: Story = {
+  args: {
+    nodes: manyNodes,
+    activeClusterId: manyNodes[0]?.id ?? null,
+  },
+};

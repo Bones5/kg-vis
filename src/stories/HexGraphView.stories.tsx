@@ -41,3 +41,15 @@ export const ErrorState: Story = {
     </div>
   ),
 };
+
+export const SmallGraph: Story = {
+  args: {
+    payload: generateMockGraph({ clusterCount: 2, nodesPerCluster: 5, edgeDensity: 0.2 }),
+  },
+};
+
+export const LargeGraph: Story = {
+  args: {
+    payload: generateMockGraph({ clusterCount: 20, nodesPerCluster: 50, edgeDensity: 0.3 }),
+  },
+};

@@ -35,3 +35,30 @@ export const OverflowStubs: Story = {
     payload: generateMockGraph({ clusterCount: 50, nodesPerCluster: 20, edgeDensity: 0.2 }),
   },
 };
+
+const singleNeighborPayload = generateMockGraph({ clusterCount: 3, nodesPerCluster: 10, edgeDensity: 0.2, interClusterDensity: 0.3 });
+
+export const SingleNeighbor: Story = {
+  args: {
+    payload: singleNeighborPayload,
+    centerId: singleNeighborPayload.levels["0"].nodes[0]?.id ?? "C1",
+  },
+};
+
+const fewPayload = generateMockGraph({ clusterCount: 5, nodesPerCluster: 15, edgeDensity: 0.2, interClusterDensity: 0.5 });
+
+export const FewNeighbors: Story = {
+  args: {
+    payload: fewPayload,
+    centerId: fewPayload.levels["0"].nodes[0]?.id ?? "C1",
+  },
+};
+
+const noOverflowPayload = generateMockGraph({ clusterCount: 12, nodesPerCluster: 20, edgeDensity: 0.25, interClusterDensity: 0.6 });
+
+export const NoOverflow: Story = {
+  args: {
+    payload: noOverflowPayload,
+    centerId: noOverflowPayload.levels["0"].nodes[0]?.id ?? "C1",
+  },
+};
