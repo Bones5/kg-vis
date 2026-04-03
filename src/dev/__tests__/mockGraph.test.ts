@@ -75,13 +75,13 @@ describe("generateMockGraph", () => {
     const g = generateMockGraph({ clusterCount: 2, nodesPerCluster: 10, edgeDensity: 0.5 });
     const allEdges = g.levels["2"].edges;
     const clusterIds = new Set(g.levels["0"].nodes.map((n) => n.id));
+    // Intra-cluster edges connect two word nodes (neither endpoint is a cluster node)
     const intraEdges = allEdges.filter(
       (e) => !clusterIds.has(e.source as string) && !clusterIds.has(e.target as string)
-        && !(e.source as string).startsWith("C") || (e.source as string).includes("_w")
     );
-    // Just check that some edges have similarity in [0.7, 1.0]
-    const withSimilarity = intraEdges.filter((e) => e.similarity !== undefined);
-    for (const edge of withSimilarity) {
+    expect(intraEdges.length).toBeGreaterThan(0);
+    for (const edge of intraEdges) {
+      expect(edge.similarity).toBeDefined();
       expect(edge.similarity).toBeGreaterThanOrEqual(0.7);
       expect(edge.similarity).toBeLessThanOrEqual(1.0);
     }
