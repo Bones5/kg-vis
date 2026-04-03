@@ -50,14 +50,9 @@ export const NoEdges: Story = {
   },
 };
 
-const sparsePayload = generateMockGraph({ clusterCount: 3, nodesPerCluster: 5, edgeDensity: 0.05, interClusterDensity: 0.5 });
-const sparseNodes = layoutOverview(sparsePayload);
-const sparseLevel0 = sparsePayload.levels["0"];
-const sparseEdges = routeEdges(sparseNodes, sparseLevel0.edges, computeContactPairs(sparseNodes));
-
 export const SingleEdge: Story = {
   args: {
-    edges: sparseEdges.slice(0, 1),
+    edges: edges.slice(0, 1),
     hoveredId: null,
   },
 };

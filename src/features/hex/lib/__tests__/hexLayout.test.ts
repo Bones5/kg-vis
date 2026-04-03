@@ -151,7 +151,7 @@ describe("layoutRing", () => {
     expect(totalNeighbors).toBeGreaterThan(36);
   });
 
-  it("places exactly 36 visible when neighbors fill all tiers", () => {
+  it("caps visible nodes at 36 when neighbors fill all tiers", () => {
     // With 50 clusters connected to C1, we need many neighbors
     const dense = generateMockGraph({
       clusterCount: 50,

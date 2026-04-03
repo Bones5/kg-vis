@@ -26,7 +26,7 @@ describe("parsePositiveInt", () => {
     expect(parsePositiveInt("abc", 8)).toBe(8);
   });
 
-  it("returns fallback for floating point string", () => {
+  it("truncates floating point string to a positive integer", () => {
     // parseInt will parse "3.7" as 3, which is > 0
     expect(parsePositiveInt("3.7", 8)).toBe(3);
   });

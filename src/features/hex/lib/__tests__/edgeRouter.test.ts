@@ -101,9 +101,27 @@ describe("routeEdges", () => {
     const level0 = payload.levels["0"];
     const routed = routeEdges(nodes, level0.edges, contactPairs);
 
-    // All routed edges should have at least one segment
-    for (const edge of routed) {
-      expect(edge.segments.length).toBeGreaterThan(0);
+    const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+
+    // Find a fallback edge: single segment whose endpoints match src/tgt pixel coords
+    const fallbackEdge = routed.find((edge) => {
+      if (edge.segments.length !== 1) return false;
+      const src = nodeMap.get(edge.sourceId);
+      const tgt = nodeMap.get(edge.targetId);
+      if (!src || !tgt) return false;
+      const seg = edge.segments[0];
+      return (
+        seg.from.px === src.px &&
+        seg.from.py === src.py &&
+        seg.to.px === tgt.px &&
+        seg.to.py === tgt.py
+      );
+    });
+
+    // With 20 densely-packed clusters some edges should hit the A* fallback
+    expect(fallbackEdge).toBeDefined();
+    if (fallbackEdge) {
+      expect(fallbackEdge.segments).toHaveLength(1);
     }
   });
 
