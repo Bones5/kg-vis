@@ -147,13 +147,14 @@ playwright.config.ts
 | Hex overview layout | ✅ | Cluster overview and routed edges are implemented |
 | Drill-in navigation | ✅ | Breadcrumbs, ring layout, minimap, and overflow stubs are in place |
 | Rive integration | ✅ | Center-node animation is wired into the ring view |
-| Search | 🟡 | Stub hook/component files exist, but no UI behavior yet |
-| Filters | 🟡 | Stub hook/component files exist, but no filter logic yet |
-| Progress tracking | 🟡 | Stub APIs exist, but no persistence or panel yet |
-| Clustering controls | 🟡 | Placeholder hook/panel exist, but no behavior yet |
-| Metrics overlay | 🟡 | Placeholder hook/panel exist, but no behavior yet |
-| Storybook | ✅ | Config, scripts, and primitive/composed stories are implemented |
-| Playwright | ✅ | Config, scripts, and e2e user-journey coverage are implemented |
+| Storybook | 🟡 | 7 files / 18 stories — needs data-variation and shared-component coverage |
+| Playwright | 🟡 | 1 spec / 3 scenarios — needs data-variation and error-path journeys |
+| **Graph state coverage** | 🔴 | **Next priority** — present the graph in sparse, dense, single-cluster, empty, and large-graph scenarios |
+| Search | ⏸ | Deferred — stub files exist |
+| Filters | ⏸ | Deferred — stub files exist |
+| Progress tracking | ⏸ | Deferred — stub files exist |
+| Clustering controls | ⏸ | Deferred — stub files exist |
+| Metrics overlay | ⏸ | Deferred — stub files exist |
 
 ## Suggested hosted dev setup
 
