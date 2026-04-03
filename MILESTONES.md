@@ -15,7 +15,7 @@ Expand visual coverage of the graph across a wide range of data shapes and UI st
 | Rive integration | ✅ Done | Center node uses `RiveNode` in the ring view |
 | Storybook | 🟡 Partial | 7 story files, 18 stories — missing data-variation and shared-component coverage |
 | Playwright | 🟡 Partial | 1 spec file, 3 test scenarios — missing data-variation and error-path journeys |
-| Graph state coverage | 🔴 Not started | No stories or tests exercise sparse, dense, single-cluster, empty, or large-graph scenarios |
+| Graph state coverage | 🟡 Partial | Some stories and tests cover dense and overflow/large-graph behavior, but coverage is still incomplete for sparse, single-cluster, empty, and other data-shape scenarios |
 | Search | ⏸ Deferred | Stub files exist — not the current priority |
 | Filters | ⏸ Deferred | Stub files exist — not the current priority |
 | Progress tracking | ⏸ Deferred | Stub files exist — not the current priority |
@@ -49,7 +49,7 @@ The most important work is making the existing visualization presentable across 
 | Sparse graph navigation | Drill-in and breadcrumb return with 2 clusters, low density |
 | Dense graph navigation | Drill-in with 15+ clusters, high density |
 | Single cluster app | App renders and does not crash with only 1 cluster |
-| Empty graph app | App shows a meaningful empty state when 0 clusters are generated |
+| Empty graph app | App shows a meaningful empty state when 0 clusters are generated (requires allowing non-negative `mockClusterCount` in `useGraphData`, since the current positive-int parser falls back to the default for values ≤ 0) |
 | Error recovery | Force a data error; confirm fallback renders and no crash |
 
 ### Unit tests to add
@@ -58,7 +58,7 @@ The most important work is making the existing visualization presentable across 
 | --- | --- |
 | Hex layout edge cases | Layout with 0, 1, 2, 20+ clusters |
 | Edge router edge cases | Routing with 0 edges, all-self-loop edges, fully connected graph |
-| Mock graph extremes | `nodesPerCluster: 0`, `edgeDensity: 0`, `edgeDensity: 1` |
+| Mock graph extremes | `clusterCount: 0`, `nodesPerCluster: 1`, `edgeDensity: 1` |
 
 ## What is already implemented
 
@@ -103,7 +103,7 @@ Scenarios in `e2e/graph-navigation.spec.ts`:
 
 Viewports: desktop `1280×800`, tablet `1024×768`.
 
-Gaps: no data-variation journeys (sparse, dense, single-cluster, empty), no error-path E2E test.
+Gaps: additional data-variation journeys still needed for sparse, single-cluster, and empty graphs, plus an error-path E2E test.
 
 ### Unit tests (4 files, 46 tests)
 
@@ -112,7 +112,7 @@ Gaps: no data-variation journeys (sparse, dense, single-cluster, empty), no erro
 - `hexMath.test.ts` — 11 tests (hex coordinate math)
 - `edgeRouter.test.ts` — 6 tests (path routing)
 
-Gaps: no tests for layout with 0 or 1 cluster, no edge-router tests with 0 edges or fully connected graphs.
+Gaps: no test for layout with 0 clusters, and no edge-router tests for fully connected graphs or self-loops.
 
 ## Hosted development recommendation
 

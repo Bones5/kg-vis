@@ -149,7 +149,7 @@ playwright.config.ts
 | Rive integration | ✅ | Center-node animation is wired into the ring view |
 | Storybook | 🟡 | 7 files / 18 stories — needs data-variation and shared-component coverage |
 | Playwright | 🟡 | 1 spec / 3 scenarios — needs data-variation and error-path journeys |
-| **Graph state coverage** | 🔴 | **Next priority** — present the graph in sparse, dense, single-cluster, empty, and large-graph scenarios |
+| **Graph state coverage** | 🟡 | **Next priority** — some dense/overflow coverage exists; still need sparse, single-cluster, empty, and other data-shape scenarios |
 | Search | ⏸ | Deferred — stub files exist |
 | Filters | ⏸ | Deferred — stub files exist |
 | Progress tracking | ⏸ | Deferred — stub files exist |
