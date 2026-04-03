@@ -11,12 +11,18 @@ export interface GraphNode {
   y: number;
   fx?: number;
   fy?: number;
+  /** Cluster-only: average intra-cluster edge density (0–1). */
+  cohesion?: number;
+  /** Cluster-only: mean importance of member word nodes. */
+  avgImportance?: number;
 }
 
 export interface GraphEdge {
   source: string;
   target: string;
   weight?: number;
+  /** Semantic similarity between endpoints, 0 (unrelated) to 1 (identical). */
+  similarity?: number;
 }
 
 export interface GraphLevel {
