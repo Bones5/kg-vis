@@ -1,0 +1,2194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Components Manifest</title>
+  <style>
+      :root {
+          --bg: #0b0c10;
+          --panel: #121318;
+          --muted: #9aa0a6;
+          --fg: #e8eaed;
+          --ok: #22c55e;
+          --info: #1e88e5;
+          --err: #c62828;
+          --ok-bg: #0c1a13;
+          --info-bg: #0c1624;
+          --err-bg: #1a0e0e;
+          --chip: #1f2330;
+          --border: #2b2f3a;
+          --link: #8ab4f8;
+          --active-ring: 1px; /* 1px active ring for pills and toggles */
+      }
+
+      * {
+          box-sizing: border-box;
+      }
+
+      html,
+      body {
+          margin: 0;
+          background: var(--bg);
+          color: var(--fg);
+          font: 14px/1.5 system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Ubuntu,
+          Cantarell,
+          'Helvetica Neue',
+          Arial,
+          'Noto Sans';
+      }
+
+      .wrap {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 16px 20px;
+      }
+
+      header {
+          position: sticky;
+          top: 0;
+          backdrop-filter: blur(6px);
+          background: color-mix(in srgb, var(--bg) 84%, transparent);
+          border-bottom: 1px solid var(--border);
+          z-index: 10;
+      }
+
+      h1 {
+          font-size: 20px;
+          margin: 0 0 6px;
+      }
+
+      .summary {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          align-items: center;
+      }
+
+      /* Top filter pills */
+      .filter-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border: 1px solid var(--border);
+          border-radius: 999px;
+          background: var(--panel);
+          text-decoration: none;
+          cursor: pointer;
+          user-select: none;
+          color: var(--fg);
+      }
+
+      .filter-pill.ok {
+          color: #b9f6ca;
+          border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+          background: color-mix(in srgb, var(--ok) 18%, #000);
+      }
+
+      .filter-pill.info {
+          color: #b3d9ff;
+          border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+          background: var(--info-bg);
+      }
+
+      .filter-pill.err {
+          color: #ff9aa0;
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+          background: var(--err-bg);
+      }
+
+      .filter-pill.all {
+          color: #d7dbe0;
+          border-color: var(--border);
+          background: var(--panel);
+      }
+
+      .filter-pill[aria-disabled='true'] {
+          cursor: default;
+          text-decoration: none;
+      }
+
+      .filter-pill:focus,
+      .filter-pill:active {
+          outline: none;
+          box-shadow: none;
+      }
+
+      /* Selected top pill ring via :target */
+      #filter-all:target ~ header .filter-pill[data-k='all'],
+      #filter-errors:target ~ header .filter-pill[data-k='errors'],
+      #filter-infos:target ~ header .filter-pill[data-k='infos'],
+      #filter-story-errors:target ~ header .filter-pill[data-k='story-errors'],
+      #filter-doc-errors:target ~ header .filter-pill[data-k='docs'],
+      #filter-docs:target ~ header .filter-pill[data-k='docs'] {
+          box-shadow: 0 0 0 var(--active-ring) currentColor;
+          border-color: currentColor;
+      }
+
+      /* Hidden targets for filtering */
+      #filter-all,
+      #filter-errors,
+      #filter-infos,
+      #filter-story-errors,
+      #filter-doc-errors,
+      #filter-docs {
+          display: none;
+      }
+
+      main {
+          padding: 36px 0 40px;
+      }
+
+      .grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 18px;
+      }
+
+      /* one card per row */
+
+      .card {
+          border: 1px solid var(--border);
+          background: var(--panel);
+          border-radius: 14px;
+          padding: 14px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+      }
+
+      .head {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+      }
+
+      .title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+      }
+
+      .title h2 {
+          font-size: 16px;
+          margin: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+      }
+
+      .meta {
+          font-size: 12px;
+          color: var(--muted);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+      }
+
+      .kv {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+      }
+
+      .chip {
+          font-size: 12px;
+          padding: 4px 8px;
+          border-radius: 999px;
+          background: var(--chip);
+          border: 1px solid var(--border);
+      }
+
+      .hint {
+          color: var(--muted);
+          font-size: 12px;
+      }
+
+      .badges {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+      }
+
+      /* Per-card badges: labels become toggles when clickable */
+      .badge {
+          font-size: 12px;
+          padding: 3px 8px;
+          border-radius: 999px;
+          border: 1px solid var(--border);
+          background: var(--chip);
+          color: #d7dbe0;
+      }
+
+      .badge.ok {
+          color: #b9f6ca;
+          border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+      }
+
+      .badge.info {
+          color: #b3d9ff;
+          border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+      }
+
+      .badge.err {
+          color: #ff9aa0;
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+      }
+
+      .as-toggle {
+          cursor: pointer;
+      }
+
+      /* 1px ring on active toggle */
+      .tg-err:checked + label.as-toggle,
+      .tg-info:checked + label.as-toggle,
+      .tg-stories:checked + label.as-toggle,
+      .tg-docs:checked + label.as-toggle,
+      .tg-content:checked + label.as-toggle,
+      .tg-props:checked + label.as-toggle {
+          box-shadow: 0 0 0 var(--active-ring) currentColor;
+          border-color: currentColor;
+      }
+
+      /* Panels: hidden by default, shown when respective toggle checked */
+      .panels {
+          display: grid;
+          gap: 10px;
+      }
+
+      .panel {
+          display: none;
+      }
+
+      .tg-err:checked ~ .panels .panel-err {
+          display: grid;
+      }
+
+      .tg-info:checked ~ .panels .panel-info {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-stories:checked ~ .panels .panel-stories {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-docs:checked ~ .panels .panel-docs {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-content:checked ~ .panels .panel-content {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-props:checked ~ .panels .panel-props {
+          display: grid;
+      }
+
+      /* Colored notes for prop type error + info */
+      .note {
+          padding: 12px;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+      }
+
+      .note.err {
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+          background: var(--err-bg);
+          color: #ffd1d4;
+      }
+
+      .note.info {
+          border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+          background: var(--info-bg);
+          color: #d6e8ff;
+      }
+
+      .note.ok {
+          border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+          background: var(--ok-bg);
+          color: var(--fg);
+      }
+
+      .note-title {
+          font-weight: 600;
+          margin-bottom: 6px;
+      }
+
+      .note-body {
+          white-space: normal;
+      }
+
+      /* Story error cards */
+      .ex {
+          padding: 10px;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          background: #0f131b;
+      }
+
+      .ex.err {
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+      }
+
+      .row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+      }
+
+      .status-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          display: inline-block;
+      }
+
+      .dot-ok {
+          background: var(--ok);
+      }
+
+      .dot-err {
+          background: var(--err);
+      }
+
+      .ex-name {
+          font-weight: 600;
+      }
+
+      /* Error groups (visible in errors filter) */
+      .error-groups {
+          display: none;
+          margin-bottom: 16px;
+      }
+
+      .group {
+          border: 1px solid var(--border);
+          background: var(--panel);
+          border-radius: 14px;
+          overflow: hidden;
+      }
+
+      .group + .group {
+          margin-top: 12px;
+      }
+
+      .group-header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 14px;
+          cursor: pointer;
+          border-bottom: 1px solid var(--border);
+      }
+
+      .group-header:hover {
+          background: #141722;
+      }
+
+      .group-title {
+          font-weight: 600;
+          flex: 1;
+      }
+
+      .group-count {
+          font-size: 12px;
+          color: var(--muted);
+      }
+
+      .group-cards {
+          display: none;
+          padding: 12px;
+      }
+
+      .group .card {
+          margin: 12px 0;
+      }
+
+      .group .card:first-child {
+          margin-top: 0;
+      }
+
+      .group .card:last-child {
+          margin-bottom: 0;
+      }
+
+      /* caret rotation */
+      .group-tg:checked + label .caret {
+          transform: rotate(90deg);
+      }
+
+      .caret {
+          transition: transform 0.15s ease;
+      }
+
+      /* toggle body */
+      .group-tg:checked ~ .group-cards {
+          display: block;
+      }
+
+      /* CSS-only filtering of cards via top pills */
+      #filter-errors:target ~ main .card:not(.has-error):not(.has-story-error) {
+          display: none;
+      }
+
+      #filter-infos:target ~ main .card:not(.has-info) {
+          display: none;
+      }
+
+      #filter-story-errors:target ~ main .card:not(.has-story-error) {
+          display: none;
+      }
+
+      #filter-doc-errors:target ~ main .card:not(.has-doc-error) {
+          display: none;
+      }
+
+      #filter-docs:target ~ main .card:has(> .tg-docs),
+      #filter-docs:target ~ main .card.is-doc {
+          display: block;
+      }
+
+      #filter-docs:target ~ main .card:not(:has(> .tg-docs)):not(.is-doc) {
+          display: none;
+      }
+
+      #filter-all:target ~ main .card {
+          display: block;
+      }
+
+      /* In errors view, hide standalone component-error cards in the regular grid (they will appear in groups) */
+      #filter-errors:target ~ main .grid .card.has-error {
+          display: none;
+      }
+
+      /* Show grouped section only in errors view */
+      #filter-errors:target ~ main .error-groups {
+          display: block;
+      }
+
+      /* Section titles */
+      .section-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--muted);
+          margin: 24px 0 12px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid var(--border);
+      }
+      .section-title:first-child {
+          margin-top: 0;
+      }
+
+      /* When a toggle is checked, show the corresponding panel */
+      .card > .tg-err:checked ~ .panels .panel-err {
+          display: grid;
+      }
+      
+      .card > .tg-info:checked ~ .panels .panel-info {
+          display: grid;
+      }
+      
+      .card > .tg-stories:checked ~ .panels .panel-stories {
+          display: grid;
+      }
+
+      .card > .tg-docs:checked ~ .panels .panel-docs {
+          display: grid;
+      }
+
+      .card > .tg-content:checked ~ .panels .panel-content {
+          display: grid;
+      }
+
+      /* Add vertical spacing around panels only when any panel is visible */
+      .card > .tg-err:checked ~ .panels,
+      .card > .tg-info:checked ~ .panels,
+      .card > .tg-stories:checked ~ .panels,
+      .card > .tg-docs:checked ~ .panels,
+      .card > .tg-content:checked ~ .panels,
+      .card > .tg-props:checked ~ .panels {
+          margin: 10px 0;
+      }
+
+      /* Optional: a subtle 1px ring on the active badge, using :has() if available */
+      @supports selector(.card:has(.tg-err:checked)) {
+          .card:has(.tg-err:checked) label[for$='-err'],
+          .card:has(.tg-info:checked) label[for$='-info'],
+          .card:has(.tg-stories:checked) label[for$='-stories'],
+          .card:has(.tg-docs:checked) label[for$='-docs'],
+          .card:has(.tg-content:checked) label[for$='-content'],
+          .card:has(.tg-props:checked) label[for$='-props'] {
+              box-shadow: 0 0 0 1px currentColor;
+              border-color: currentColor;
+          }
+      }
+
+      /* Wrap long lines in code blocks at ~120 characters */
+      pre, code {
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
+      pre {
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+          word-break: break-word;
+          overflow-x: auto; /* fallback for extremely long tokens */
+          margin: 8px 0 0;
+      }
+      pre > code {
+          display: block;
+          white-space: inherit;
+          overflow-wrap: inherit;
+          word-break: inherit;
+          inline-size: min(100%, 120ch);
+      }
+
+      /* MDX content container for docs */
+      .mdx-content {
+          background: #0f131b;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          padding: 12px;
+          max-height: 400px;
+          overflow-y: auto;
+          margin-top: 8px;
+      }
+  </style>
+</head>
+<body>
+<!-- Hidden targets for the top-level filters -->
+<span id="filter-all"></span>
+<span id="filter-errors"></span>
+<span id="filter-infos"></span>
+<span id="filter-story-errors"></span>
+<span id="filter-doc-errors"></span>
+<span id="filter-docs"></span>
+<header>
+  <div class="wrap">
+    <h1>Manifest Debugger</h1>
+    <div class="summary"><a class="filter-pill all" data-k="all" href="#filter-all">All</a><span class="filter-pill ok" aria-disabled="true">12 components ok</span><a class="filter-pill info" data-k="infos" href="#filter-infos">12/12 infos</a><span class="filter-pill ok" aria-disabled="true">60 stories ok</span></div>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <div class="note info" style="margin-bottom: 16px;">
+            <strong>Tip:</strong> You are using <code>react-docgen</code> (the default). Generation took <strong>0.3s</strong>. For higher quality prop types, consider switching to <code>react-docgen-typescript</code> in your <code>main.ts</code>:
+            <pre><code>typescript: {
+  reactDocgen: 'react-docgen-typescript',
+}</code></pre>
+            Note: <code>react-docgen-typescript</code> can be slower. If performance is acceptable for your project, it generally produces better results.
+            <a href="https://storybook.js.org/docs/api/main-config/main-config-typescript#reactdocgen" target="_blank">Learn more</a>
+          </div>
+    <h2 class="section-title">Components</h2>
+    <div class="grid" role="list">
+      
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Button">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Button</h2>
+      <div class="badges">
+        <label for="c-0-shared-button-props" class="badge ok as-toggle">4 prop types</label>
+        <label for="c-0-shared-button-info" class="badge info as-toggle">1 info</label>
+        <label for="c-0-shared-button-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/Button.stories.tsx">shared-button · ./src/stories/Button.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-0-shared-button-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-0-shared-button-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-0-shared-button-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">4 prop types</span>
+            </div>
+            <pre><code>Component: src/shared/components/Button.tsx::Button</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>disabled?: boolean
+
+label: string
+
+onClick: () =&gt; void
+
+variant?: &quot;primary&quot; | &quot;secondary&quot; | &quot;ghost&quot; = &quot;primary&quot;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Button } from "kg-vis";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Primary</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Primary = () =&gt; &lt;Button label=&quot;Click me&quot; onClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Secondary</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Secondary = () =&gt; &lt;Button label=&quot;Click me&quot; onClick={() =&gt; undefined} variant=&quot;secondary&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Ghost</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Ghost = () =&gt; &lt;Button label=&quot;Click me&quot; onClick={() =&gt; undefined} variant=&quot;ghost&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Disabled</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Disabled = () =&gt; &lt;Button label=&quot;Click me&quot; onClick={() =&gt; undefined} disabled /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Long Label</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const LongLabel = () =&gt; &lt;Button
+    label=&quot;This is a button with an extremely long label that should test overflow behavior&quot;
+    onClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="GraphErrorBoundary">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> GraphErrorBoundary</h2>
+      <div class="badges">
+        <label for="c-1-graph-grapherrorboundary-props" class="badge ok as-toggle">2 prop types</label>
+        <label for="c-1-graph-grapherrorboundary-info" class="badge info as-toggle">1 info</label>
+        <label for="c-1-graph-grapherrorboundary-stories" class="badge ok as-toggle">4 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/GraphErrorBoundary.stories.tsx">graph-grapherrorboundary · ./src/stories/GraphErrorBoundary.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-1-graph-grapherrorboundary-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-1-graph-grapherrorboundary-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-1-graph-grapherrorboundary-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">2 prop types</span>
+            </div>
+            <pre><code>Component: src/features/graph/components/GraphErrorBoundary.tsx::GraphErrorBoundary</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>children: ReactNode
+
+fallback?: ReactNode</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { GraphErrorBoundary } from "kg-vis";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Healthy Child</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const HealthyChild = () =&gt; (
+  &lt;GraphErrorBoundary&gt;
+    &lt;div style={{ color: &quot;#e2e8f0&quot;, background: &quot;#0f172a&quot;, padding: 16 }}&gt;Graph content&lt;/div&gt;
+  &lt;/GraphErrorBoundary&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Error Fallback</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ErrorFallback = () =&gt; (
+  &lt;GraphErrorBoundary&gt;
+    &lt;ErrorThrower /&gt;
+  &lt;/GraphErrorBoundary&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Custom Fallback</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CustomFallback = () =&gt; (
+  &lt;GraphErrorBoundary
+    fallback={
+      &lt;div style={{ color: &quot;#f87171&quot;, background: &quot;#0f172a&quot;, padding: 24, textAlign: &quot;center&quot; }}&gt;
+        &lt;h2&gt;⚠️ Custom error UI&lt;/h2&gt;
+        &lt;p&gt;Something went wrong. Please try refreshing the page.&lt;/p&gt;
+      &lt;/div&gt;
+    }
+  &gt;
+    &lt;ErrorThrower /&gt;
+  &lt;/GraphErrorBoundary&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Long Error Message</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const LongErrorMessage = () =&gt; (
+  &lt;GraphErrorBoundary&gt;
+    &lt;LongErrorThrower /&gt;
+  &lt;/GraphErrorBoundary&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="HexGraphView">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> HexGraphView</h2>
+      <div class="badges">
+        <label for="c-2-hex-composed-hexgraphview-props" class="badge ok as-toggle">1 prop type</label>
+        <label for="c-2-hex-composed-hexgraphview-info" class="badge info as-toggle">1 info</label>
+        <label for="c-2-hex-composed-hexgraphview-stories" class="badge ok as-toggle">4 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/HexGraphView.stories.tsx">hex-composed-hexgraphview · ./src/stories/HexGraphView.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-2-hex-composed-hexgraphview-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-2-hex-composed-hexgraphview-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-2-hex-composed-hexgraphview-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">1 prop type</span>
+            </div>
+            <pre><code>Component: src/features/hex/components/HexGraphView.tsx::HexGraphView</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>payload: GraphPayload</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { GraphErrorBoundary, HexGraphView } from "kg-vis";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Overview To Ring Interactive</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const OverviewToRingInteractive = () =&gt; &lt;HexGraphView payload={payload} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Error State</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ErrorState = () =&gt; (
+  &lt;div style={{ width: &quot;100%&quot;, height: &quot;100vh&quot;, background: &quot;#0f172a&quot; }}&gt;
+    &lt;GraphErrorBoundary&gt;
+      &lt;BrokenGraph /&gt;
+    &lt;/GraphErrorBoundary&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Small Graph</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const SmallGraph = () =&gt; &lt;HexGraphView
+    payload={generateMockGraph({ clusterCount: 2, nodesPerCluster: 5, edgeDensity: 0.2 })} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Large Graph</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const LargeGraph = () =&gt; &lt;HexGraphView
+    payload={generateMockGraph({ clusterCount: 20, nodesPerCluster: 50, edgeDensity: 0.3 })} /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="HexOverview">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> HexOverview</h2>
+      <div class="badges">
+        <label for="c-3-hex-composed-hexoverview-props" class="badge ok as-toggle">2 prop types</label>
+        <label for="c-3-hex-composed-hexoverview-info" class="badge info as-toggle">1 info</label>
+        <label for="c-3-hex-composed-hexoverview-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/HexOverview.stories.tsx">hex-composed-hexoverview · ./src/stories/HexOverview.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-3-hex-composed-hexoverview-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-3-hex-composed-hexoverview-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-3-hex-composed-hexoverview-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">2 prop types</span>
+            </div>
+            <pre><code>Component: src/features/hex/components/HexOverview.tsx::HexOverview</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>onClusterClick: (clusterId: string) =&gt; void
+
+payload: GraphPayload</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { HexOverview } from "kg-vis";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;HexOverview payload={payload} onClusterClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Dense Edges</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const DenseEdges = () =&gt; &lt;HexOverview
+    payload={generateMockGraph({ clusterCount: 10, nodesPerCluster: 35, edgeDensity: 0.4 })}
+    onClusterClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Single Cluster</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const SingleCluster = () =&gt; &lt;HexOverview
+    payload={generateMockGraph({ clusterCount: 1, nodesPerCluster: 20, edgeDensity: 0.3 })}
+    onClusterClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Sparse Edges</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const SparseEdges = () =&gt; &lt;HexOverview
+    payload={generateMockGraph({ clusterCount: 8, nodesPerCluster: 30, edgeDensity: 0.05, interClusterDensity: 0.1 })}
+    onClusterClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Many Clusters</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ManyClusters = () =&gt; &lt;HexOverview
+    payload={generateMockGraph({ clusterCount: 20, nodesPerCluster: 10, edgeDensity: 0.2 })}
+    onClusterClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="HexPill">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> HexPill</h2>
+      <div class="badges">
+        <label for="c-4-hex-primitives-hexpill-props" class="badge ok as-toggle">7 prop types</label>
+        <label for="c-4-hex-primitives-hexpill-info" class="badge info as-toggle">1 info</label>
+        <label for="c-4-hex-primitives-hexpill-stories" class="badge ok as-toggle">12 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/HexPill.stories.tsx">hex-primitives-hexpill · ./src/stories/HexPill.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-4-hex-primitives-hexpill-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-4-hex-primitives-hexpill-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-4-hex-primitives-hexpill-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">7 prop types</span>
+            </div>
+            <pre><code>Component: src/features/hex/components/HexPill.tsx::HexPill</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>dimmed?: boolean = false
+
+isHovered?: boolean = false
+
+isSelected?: boolean = false
+
+node: HexNode
+
+onClick: (id: string) =&gt; void
+
+onHover: (id: string | null) =&gt; void
+
+tier?: &quot;inner&quot; | &quot;middle&quot; | &quot;outer&quot;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { HexPill } from "kg-vis";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;HexPill node={baseNode} onHover={() =&gt; undefined} onClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Hovered</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Hovered = () =&gt; &lt;HexPill
+    node={baseNode}
+    onHover={() =&gt; undefined}
+    onClick={() =&gt; undefined}
+    isHovered /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Selected</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Selected = () =&gt; &lt;HexPill
+    node={baseNode}
+    onHover={() =&gt; undefined}
+    onClick={() =&gt; undefined}
+    isSelected /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Dimmed</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Dimmed = () =&gt; &lt;HexPill
+    node={baseNode}
+    onHover={() =&gt; undefined}
+    onClick={() =&gt; undefined}
+    dimmed /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Tier Outer</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const TierOuter = () =&gt; &lt;HexPill
+    node={{ ...baseNode, id: &quot;C2&quot;, label: &quot;Art&quot;, importance: 0.45, childCount: 4 }}
+    onHover={() =&gt; undefined}
+    onClick={() =&gt; undefined}
+    tier=&quot;outer&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Hovered And Selected</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const HoveredAndSelected = () =&gt; &lt;HexPill
+    node={baseNode}
+    onHover={() =&gt; undefined}
+    onClick={() =&gt; undefined}
+    isHovered
+    isSelected /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Zero Importance</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ZeroImportance = () =&gt; &lt;HexPill
+    node={{ ...baseNode, importance: 0.0 }}
+    onHover={() =&gt; undefined}
+    onClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Max Importance</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const MaxImportance = () =&gt; &lt;HexPill
+    node={{ ...baseNode, importance: 1.0 }}
+    onHover={() =&gt; undefined}
+    onClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Long Label</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const LongLabel = () =&gt; &lt;HexPill
+    node={{ ...baseNode, label: &quot;Quantum Computing &amp; Theoretical Physics Research&quot; }}
+    onHover={() =&gt; undefined}
+    onClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">No Children</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const NoChildren = () =&gt; &lt;HexPill
+    node={{ ...baseNode, childCount: 0 }}
+    onHover={() =&gt; undefined}
+    onClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">High Child Count</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const HighChildCount = () =&gt; &lt;HexPill
+    node={{ ...baseNode, childCount: 999 }}
+    onHover={() =&gt; undefined}
+    onClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Strength</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithStrength = () =&gt; &lt;HexPill
+    node={ringNode}
+    onHover={() =&gt; undefined}
+    onClick={() =&gt; undefined}
+    tier=&quot;inner&quot; /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="HexRing">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> HexRing</h2>
+      <div class="badges">
+        <label for="c-5-hex-composed-hexring-props" class="badge ok as-toggle">3 prop types</label>
+        <label for="c-5-hex-composed-hexring-info" class="badge info as-toggle">1 info</label>
+        <label for="c-5-hex-composed-hexring-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/HexRing.stories.tsx">hex-composed-hexring · ./src/stories/HexRing.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-5-hex-composed-hexring-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-5-hex-composed-hexring-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-5-hex-composed-hexring-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">3 prop types</span>
+            </div>
+            <pre><code>Component: src/features/hex/components/HexRing.tsx::HexRing</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>centerId: string
+
+onClusterClick: (clusterId: string) =&gt; void
+
+payload: GraphPayload</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { HexRing } from "kg-vis";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;HexRing
+    centerId={centerId}
+    payload={basePayload}
+    onClusterClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Overflow Stubs</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const OverflowStubs = () =&gt; &lt;HexRing
+    centerId={centerId}
+    payload={generateMockGraph({ clusterCount: 50, nodesPerCluster: 20, edgeDensity: 0.2 })}
+    onClusterClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Single Neighbor</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const SingleNeighbor = () =&gt; &lt;HexRing
+    centerId={singleNeighborPayload.levels[&quot;0&quot;].nodes[0]?.id ?? &quot;C1&quot;}
+    payload={singleNeighborPayload}
+    onClusterClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Few Neighbors</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const FewNeighbors = () =&gt; &lt;HexRing
+    centerId={fewPayload.levels[&quot;0&quot;].nodes[0]?.id ?? &quot;C1&quot;}
+    payload={fewPayload}
+    onClusterClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">No Overflow</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const NoOverflow = () =&gt; &lt;HexRing
+    centerId={noOverflowPayload.levels[&quot;0&quot;].nodes[0]?.id ?? &quot;C1&quot;}
+    payload={noOverflowPayload}
+    onClusterClick={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Minimap">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Minimap</h2>
+      <div class="badges">
+        <label for="c-6-hex-primitives-minimap-props" class="badge ok as-toggle">3 prop types</label>
+        <label for="c-6-hex-primitives-minimap-info" class="badge info as-toggle">1 info</label>
+        <label for="c-6-hex-primitives-minimap-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/Minimap.stories.tsx">hex-primitives-minimap · ./src/stories/Minimap.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-6-hex-primitives-minimap-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-6-hex-primitives-minimap-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-6-hex-primitives-minimap-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">3 prop types</span>
+            </div>
+            <pre><code>Component: src/features/hex/components/Minimap.tsx::Minimap</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>activeClusterId: string | null
+
+nodes: HexNode[]
+
+onNavigate: (clusterId: string) =&gt; void</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Minimap } from "kg-vis";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;Minimap
+    nodes={nodes}
+    activeClusterId={nodes[0]?.id ?? null}
+    onNavigate={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Different Active Cluster</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const DifferentActiveCluster = () =&gt; &lt;Minimap
+    nodes={nodes}
+    activeClusterId={nodes[2]?.id ?? null}
+    onNavigate={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Empty</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Empty = () =&gt; &lt;Minimap nodes={[]} activeClusterId={null} onNavigate={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Single Node</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const SingleNode = () =&gt; &lt;Minimap
+    nodes={singleNodes}
+    activeClusterId={singleNodes[0]?.id ?? null}
+    onNavigate={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Many Nodes</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ManyNodes = () =&gt; &lt;Minimap
+    nodes={manyNodes}
+    activeClusterId={manyNodes[0]?.id ?? null}
+    onNavigate={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Modal">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Modal</h2>
+      <div class="badges">
+        <label for="c-7-shared-modal-props" class="badge ok as-toggle">4 prop types</label>
+        <label for="c-7-shared-modal-info" class="badge info as-toggle">1 info</label>
+        <label for="c-7-shared-modal-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/Modal.stories.tsx">shared-modal · ./src/stories/Modal.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-7-shared-modal-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-7-shared-modal-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-7-shared-modal-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">4 prop types</span>
+            </div>
+            <pre><code>Component: src/shared/components/Modal.tsx::Modal</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>children: ReactNode
+
+onClose: () =&gt; void
+
+open: boolean
+
+title?: string</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Modal } from "kg-vis";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Open</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Open = () =&gt; &lt;Modal open onClose={() =&gt; undefined} title=&quot;Example Modal&quot;&gt;&lt;p style={{ color: &quot;#e2e8f0&quot; }}&gt;Modal body content&lt;/p&gt;&lt;/Modal&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Closed</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Closed = () =&gt; &lt;Modal open={false} onClose={() =&gt; undefined}&gt;&lt;p style={{ color: &quot;#e2e8f0&quot; }}&gt;Modal body content&lt;/p&gt;&lt;/Modal&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Title</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithTitle = () =&gt; &lt;Modal open onClose={() =&gt; undefined} title=&quot;Settings&quot;&gt;&lt;p style={{ color: &quot;#e2e8f0&quot; }}&gt;Modal body content&lt;/p&gt;&lt;/Modal&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Without Title</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithoutTitle = () =&gt; &lt;Modal open onClose={() =&gt; undefined}&gt;&lt;p style={{ color: &quot;#e2e8f0&quot; }}&gt;Modal body content&lt;/p&gt;&lt;/Modal&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Long Content</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const LongContent = () =&gt; &lt;Modal open onClose={() =&gt; undefined} title=&quot;Long Content&quot;&gt;(&lt;div style={{ color: &quot;#e2e8f0&quot; }}&gt;
+      {Array.from({ length: 20 }, (_, i) =&gt; (
+        &lt;p key={i}&gt;
+          Paragraph {i + 1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        &lt;/p&gt;
+      ))}
+    &lt;/div&gt;)&lt;/Modal&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="RoutedEdges">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> RoutedEdges</h2>
+      <div class="badges">
+        <label for="c-8-hex-primitives-routededges-props" class="badge ok as-toggle">6 prop types</label>
+        <label for="c-8-hex-primitives-routededges-info" class="badge info as-toggle">1 info</label>
+        <label for="c-8-hex-primitives-routededges-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/RoutedEdges.stories.tsx">hex-primitives-routededges · ./src/stories/RoutedEdges.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-8-hex-primitives-routededges-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-8-hex-primitives-routededges-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-8-hex-primitives-routededges-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">6 prop types</span>
+            </div>
+            <pre><code>Component: src/features/hex/components/RoutedEdges.tsx::RoutedEdges</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>edges: RoutedEdge[]
+
+height: number
+
+hoveredId: string | null
+
+offsetX: number
+
+offsetY: number
+
+width: number</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { RoutedEdges } from "kg-vis";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;RoutedEdges
+    edges={edges}
+    hoveredId={null}
+    width={900}
+    height={700}
+    offsetX={450}
+    offsetY={350} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Hover Connected</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const HoverConnected = () =&gt; &lt;RoutedEdges
+    edges={edges}
+    hoveredId={nodes[0]?.id ?? null}
+    width={900}
+    height={700}
+    offsetX={450}
+    offsetY={350} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">No Edges</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const NoEdges = () =&gt; &lt;RoutedEdges
+    edges={[]}
+    hoveredId={null}
+    width={900}
+    height={700}
+    offsetX={450}
+    offsetY={350} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Single Edge</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const SingleEdge = () =&gt; &lt;RoutedEdges
+    edges={sparseEdges.slice(0, 1)}
+    hoveredId={null}
+    width={900}
+    height={700}
+    offsetX={450}
+    offsetY={350} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Dense Edges</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const DenseEdges = () =&gt; &lt;RoutedEdges
+    edges={denseEdges}
+    hoveredId={null}
+    width={900}
+    height={700}
+    offsetX={450}
+    offsetY={350} /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Slider">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Slider</h2>
+      <div class="badges">
+        <label for="c-9-shared-slider-props" class="badge ok as-toggle">5 prop types</label>
+        <label for="c-9-shared-slider-info" class="badge info as-toggle">1 info</label>
+        <label for="c-9-shared-slider-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/Slider.stories.tsx">shared-slider · ./src/stories/Slider.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-9-shared-slider-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-9-shared-slider-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-9-shared-slider-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">5 prop types</span>
+            </div>
+            <pre><code>Component: src/shared/components/Slider.tsx::Slider</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>label?: string
+
+max: number
+
+min: number
+
+onChange: (value: number) =&gt; void
+
+value: number</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Slider } from "kg-vis";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;Slider min={0} max={100} value={50} onChange={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Min Value</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const MinValue = () =&gt; &lt;Slider min={0} max={100} value={0} onChange={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Max Value</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const MaxValue = () =&gt; &lt;Slider min={0} max={100} value={100} onChange={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Label</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithLabel = () =&gt; &lt;Slider
+    min={0}
+    max={100}
+    value={50}
+    onChange={() =&gt; undefined}
+    label=&quot;Edge density&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Without Label</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithoutLabel = () =&gt; &lt;Slider min={0} max={100} value={50} onChange={() =&gt; undefined} label={undefined} /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Toggle">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Toggle</h2>
+      <div class="badges">
+        <label for="c-10-shared-toggle-props" class="badge ok as-toggle">3 prop types</label>
+        <label for="c-10-shared-toggle-info" class="badge info as-toggle">1 info</label>
+        <label for="c-10-shared-toggle-stories" class="badge ok as-toggle">3 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/Toggle.stories.tsx">shared-toggle · ./src/stories/Toggle.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-10-shared-toggle-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-10-shared-toggle-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-10-shared-toggle-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">3 prop types</span>
+            </div>
+            <pre><code>Component: src/shared/components/Toggle.tsx::Toggle</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>checked: boolean
+
+label?: string
+
+onChange: (checked: boolean) =&gt; void</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Toggle } from "kg-vis";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Unchecked</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Unchecked = () =&gt; &lt;Toggle checked={false} onChange={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Checked</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Checked = () =&gt; &lt;Toggle checked onChange={() =&gt; undefined} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Label</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithLabel = () =&gt; &lt;Toggle checked={false} onChange={() =&gt; undefined} label=&quot;Show edges&quot; /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Tooltip">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Tooltip</h2>
+      <div class="badges">
+        <label for="c-11-shared-tooltip-props" class="badge ok as-toggle">2 prop types</label>
+        <label for="c-11-shared-tooltip-info" class="badge info as-toggle">1 info</label>
+        <label for="c-11-shared-tooltip-stories" class="badge ok as-toggle">2 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/Tooltip.stories.tsx">shared-tooltip · ./src/stories/Tooltip.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-11-shared-tooltip-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-11-shared-tooltip-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-11-shared-tooltip-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">2 prop types</span>
+            </div>
+            <pre><code>Component: src/shared/components/Tooltip.tsx::Tooltip</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>children: ReactNode
+
+content: string</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Tooltip } from "kg-vis";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;Tooltip content=&quot;Helpful tooltip text&quot;&gt;&lt;button style={{ padding: &quot;8px 16px&quot; }}&gt;Hover me&lt;/button&gt;&lt;/Tooltip&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Long Content</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const LongContent = () =&gt; &lt;Tooltip
+    content={&quot;This is a very long tooltip that contains a lot of text to test how the browser &quot; +
+    &quot;handles overflow for the native title attribute tooltip rendering behavior.&quot;}&gt;&lt;button style={{ padding: &quot;8px 16px&quot; }}&gt;Hover me&lt;/button&gt;&lt;/Tooltip&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+    </div>
+    
+    
+    
+  </div>
+</main>
+</body>
+</html>  

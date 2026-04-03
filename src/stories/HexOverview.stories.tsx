@@ -33,3 +33,21 @@ export const DenseEdges: Story = {
     payload: generateMockGraph({ clusterCount: 10, nodesPerCluster: 35, edgeDensity: 0.4 }),
   },
 };
+
+export const SingleCluster: Story = {
+  args: {
+    payload: generateMockGraph({ clusterCount: 1, nodesPerCluster: 20, edgeDensity: 0.3 }),
+  },
+};
+
+export const SparseEdges: Story = {
+  args: {
+    payload: generateMockGraph({ clusterCount: 8, nodesPerCluster: 30, edgeDensity: 0.05, interClusterDensity: 0.1 }),
+  },
+};
+
+export const ManyClusters: Story = {
+  args: {
+    payload: generateMockGraph({ clusterCount: 20, nodesPerCluster: 10, edgeDensity: 0.2 }),
+  },
+};

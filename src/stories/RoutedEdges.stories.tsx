@@ -42,3 +42,34 @@ export const HoverConnected: Story = {
     hoveredId: nodes[0]?.id ?? null,
   },
 };
+
+export const NoEdges: Story = {
+  args: {
+    edges: [],
+    hoveredId: null,
+  },
+};
+
+const sparsePayload = generateMockGraph({ clusterCount: 3, nodesPerCluster: 5, edgeDensity: 0.05, interClusterDensity: 0.5 });
+const sparseNodes = layoutOverview(sparsePayload);
+const sparseLevel0 = sparsePayload.levels["0"];
+const sparseEdges = routeEdges(sparseNodes, sparseLevel0.edges, computeContactPairs(sparseNodes));
+
+export const SingleEdge: Story = {
+  args: {
+    edges: sparseEdges.slice(0, 1),
+    hoveredId: null,
+  },
+};
+
+const densePayload = generateMockGraph({ clusterCount: 12, nodesPerCluster: 10, edgeDensity: 0.4, interClusterDensity: 0.8 });
+const denseNodes = layoutOverview(densePayload);
+const denseLevel0 = densePayload.levels["0"];
+const denseEdges = routeEdges(denseNodes, denseLevel0.edges, computeContactPairs(denseNodes));
+
+export const DenseEdges: Story = {
+  args: {
+    edges: denseEdges,
+    hoveredId: null,
+  },
+};
