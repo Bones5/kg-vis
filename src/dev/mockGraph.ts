@@ -4,7 +4,11 @@ export interface MockGraphOptions {
   clusterCount?: number;
   nodesPerCluster?: number;
   edgeDensity?: number;
+  /** Controls inter-cluster edge density separately; defaults to edgeDensity × 0.5. */
+  interClusterDensity?: number;
   spread?: number;
+  /** RNG seed for deterministic but varied topologies (default 42). */
+  seed?: number;
 }
 
 function rng(seed: number) {
@@ -20,10 +24,12 @@ export function generateMockGraph(options: MockGraphOptions = {}): GraphPayload 
     clusterCount = 8,
     nodesPerCluster = 50,
     edgeDensity = 0.3,
+    interClusterDensity = edgeDensity * 0.5,
     spread = 500,
+    seed = 42,
   } = options;
 
-  const rand = rng(42);
+  const rand = rng(seed);
 
   // --- Generate cluster centroids ---
   const clusterNodes: GraphNode[] = Array.from({ length: clusterCount }, (_, i) => {
@@ -64,7 +70,11 @@ export function generateMockGraph(options: MockGraphOptions = {}): GraphPayload 
     for (let a = 0; a < ids.length; a++) {
       for (let b = a + 1; b < ids.length; b++) {
         if (rand() < density) {
-          edges.push({ source: ids[a], target: ids[b], weight: Math.round(1 + rand() * 4) });
+          edges.push({
+            source: ids[a],
+            target: ids[b],
+            weight: Math.round(1 + rand() * 4),
+          });
         }
       }
     }
@@ -79,12 +89,48 @@ export function generateMockGraph(options: MockGraphOptions = {}): GraphPayload 
   }
 
   // Inter-cluster edges (between cluster nodes)
-  const interEdges = makeEdges(clusterNodes, edgeDensity * 0.5);
+  const interEdges = makeEdges(clusterNodes, interClusterDensity);
+
+  // Assign similarity to inter-cluster edges based on centroid distance
+  const clusterMap = new Map(clusterNodes.map((c) => [c.id, c]));
+  let maxDist = 0;
+  for (const edge of interEdges) {
+    const a = clusterMap.get(edge.source as string)!;
+    const b = clusterMap.get(edge.target as string)!;
+    const dist = Math.hypot(a.x - b.x, a.y - b.y);
+    if (dist > maxDist) maxDist = dist;
+  }
+  for (const edge of interEdges) {
+    const a = clusterMap.get(edge.source as string)!;
+    const b = clusterMap.get(edge.target as string)!;
+    const dist = Math.hypot(a.x - b.x, a.y - b.y);
+    // Closer clusters → higher similarity
+    edge.similarity = maxDist > 0 ? 1 - dist / maxDist : 1;
+  }
+
+  // Assign similarity to intra-cluster edges (high, with jitter)
+  for (const edge of intraEdges) {
+    edge.similarity = 0.7 + rand() * 0.3; // 0.7–1.0
+  }
 
   // Top-word edges connecting top words to their cluster
   const topWordEdges: GraphEdge[] = wordNodes
     .filter((n) => (n.importance ?? 0) > 0.7)
-    .map((n) => ({ source: n.cluster!, target: n.id, weight: 1 }));
+    .map((n) => ({ source: n.cluster!, target: n.id, weight: 1, similarity: 0.8 + rand() * 0.2 }));
+
+  // --- Compute cluster-level metadata ---
+  for (const cluster of clusterNodes) {
+    const members = wordNodes.filter((n) => n.cluster === cluster.id);
+    const memberIds = new Set(members.map((m) => m.id));
+    const clusterIntraEdges = intraEdges.filter(
+      (e) => memberIds.has(e.source as string) && memberIds.has(e.target as string)
+    );
+    const maxPossibleEdges = (members.length * (members.length - 1)) / 2;
+    cluster.cohesion = maxPossibleEdges > 0 ? clusterIntraEdges.length / maxPossibleEdges : 0;
+
+    const totalImportance = members.reduce((sum, m) => sum + (m.importance ?? 0), 0);
+    cluster.avgImportance = members.length > 0 ? totalImportance / members.length : 0;
+  }
 
   // --- Build levels ---
   // Level 0: clusters only

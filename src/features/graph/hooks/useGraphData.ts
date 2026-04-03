@@ -35,6 +35,11 @@ export function useGraphData(): UseGraphDataResult {
         clusterCount: parsePositiveInt(params.get("mockClusterCount"), 8),
         nodesPerCluster: parsePositiveInt(params.get("mockNodesPerCluster"), 50),
         edgeDensity: parseDensity(params.get("mockEdgeDensity"), 0.3),
+        interClusterDensity: params.get("mockInterClusterDensity")
+          ? parseDensity(params.get("mockInterClusterDensity"), 0.15)
+          : undefined,
+        spread: parsePositiveInt(params.get("mockSpread"), 500),
+        seed: parsePositiveInt(params.get("mockSeed"), 42),
       });
       setPayload(mock);
     } catch (err) {
