@@ -199,4 +199,38 @@ describe("generateMockGraph", () => {
     );
     expect(largeMaxDist).toBeGreaterThan(smallMaxDist);
   });
+
+  // ── edgeDensity=1 ───────────────────────────────────────────────────
+  it("handles edgeDensity=1 producing maximum intra-cluster edges", () => {
+    const g = generateMockGraph({
+      clusterCount: 2,
+      nodesPerCluster: 4,
+      edgeDensity: 1,
+      seed: 42,
+    });
+    const clusterIds = new Set(g.levels["0"].nodes.map((n) => n.id));
+    const allEdges = g.levels["2"].edges;
+    // Count intra-cluster edges (word-to-word within same cluster)
+    const wordNodes = g.levels["2"].nodes.filter((n) => n.type === "word");
+    const cluster1Words = wordNodes.filter((n) => n.cluster === "C1");
+    const cluster2Words = wordNodes.filter((n) => n.cluster === "C2");
+    // Verify we have the expected cluster IDs
+    expect(clusterIds.size).toBe(2);
+    // Max possible intra-cluster edges for C1 = C(n, 2)
+    const maxC1 = (cluster1Words.length * (cluster1Words.length - 1)) / 2;
+    const maxC2 = (cluster2Words.length * (cluster2Words.length - 1)) / 2;
+
+    const c1Ids = new Set(cluster1Words.map((n) => n.id));
+    const c2Ids = new Set(cluster2Words.map((n) => n.id));
+    const c1Edges = allEdges.filter(
+      (e) => c1Ids.has(e.source as string) && c1Ids.has(e.target as string)
+    );
+    const c2Edges = allEdges.filter(
+      (e) => c2Ids.has(e.source as string) && c2Ids.has(e.target as string)
+    );
+
+    // With density=1, all possible edges should exist
+    expect(c1Edges.length).toBe(maxC1);
+    expect(c2Edges.length).toBe(maxC2);
+  });
 });

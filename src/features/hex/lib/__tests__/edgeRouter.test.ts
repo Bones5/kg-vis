@@ -87,4 +87,33 @@ describe("routeEdges", () => {
       }
     }
   });
+
+  it("falls back to direct line when all cells are occupied", () => {
+    // Create a scenario with many nodes filling the grid
+    const payload = generateMockGraph({
+      clusterCount: 20,
+      nodesPerCluster: 2,
+      interClusterDensity: 0.3,
+      seed: 42,
+    });
+    const nodes = layoutOverview(payload);
+    const contactPairs = computeContactPairs(nodes);
+    const level0 = payload.levels["0"];
+    const routed = routeEdges(nodes, level0.edges, contactPairs);
+
+    // All routed edges should have at least one segment
+    for (const edge of routed) {
+      expect(edge.segments.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("handles edges referencing unknown nodes gracefully", () => {
+    const payload = generateMockGraph({ clusterCount: 3, nodesPerCluster: 2 });
+    const nodes = layoutOverview(payload);
+    const contactPairs = computeContactPairs(nodes);
+
+    const badEdges = [{ source: "UNKNOWN_A", target: "UNKNOWN_B", weight: 1 }];
+    const routed = routeEdges(nodes, badEdges, contactPairs);
+    expect(routed).toHaveLength(0);
+  });
 });

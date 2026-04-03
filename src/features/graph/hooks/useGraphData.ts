@@ -8,13 +8,15 @@ interface UseGraphDataResult {
   error: string | null;
 }
 
-function parsePositiveInt(raw: string | null, fallback: number): number {
+/** @internal Exported for testing */
+export function parsePositiveInt(raw: string | null, fallback: number): number {
   if (!raw) return fallback;
   const parsed = Number.parseInt(raw, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-function parseDensity(raw: string | null, fallback: number): number {
+/** @internal Exported for testing */
+export function parseDensity(raw: string | null, fallback: number): number {
   if (!raw) return fallback;
   const parsed = Number.parseFloat(raw);
   if (!Number.isFinite(parsed)) return fallback;

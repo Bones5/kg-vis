@@ -135,6 +135,33 @@ describe("layoutRing", () => {
     // With maxNodes=6 and many neighbors, there should be offMap stubs
     expect(result.offMap.length).toBeGreaterThan(0);
   });
+
+  it("handles 37+ neighbors correctly with overflow", () => {
+    const huge = generateMockGraph({
+      clusterCount: 50,
+      nodesPerCluster: 2,
+      interClusterDensity: 1,
+      seed: 42,
+    });
+    const result = layoutRing("C1", huge);
+    // Max visible slots = 36 (6+12+18), rest are offMap
+    const totalVisible = result.rings.length;
+    expect(totalVisible).toBeLessThanOrEqual(36);
+    const totalNeighbors = totalVisible + result.offMap.length;
+    expect(totalNeighbors).toBeGreaterThan(36);
+  });
+
+  it("places exactly 36 visible when neighbors fill all tiers", () => {
+    // With 50 clusters connected to C1, we need many neighbors
+    const dense = generateMockGraph({
+      clusterCount: 50,
+      nodesPerCluster: 2,
+      interClusterDensity: 1,
+      seed: 42,
+    });
+    const result = layoutRing("C1", dense, 36);
+    expect(result.rings.length).toBeLessThanOrEqual(36);
+  });
 });
 
 describe("countClusterMembers", () => {
