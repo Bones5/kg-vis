@@ -10,11 +10,20 @@ describe("generateMockGraph", () => {
   });
 
   it("produces different output for different seeds", () => {
-    const a = generateMockGraph({ seed: 1, clusterCount: 4, nodesPerCluster: 5 });
-    const b = generateMockGraph({ seed: 2, clusterCount: 4, nodesPerCluster: 5 });
-    const aEdges = a.levels["0"].edges.map((e) => `${e.source}-${e.target}`);
-    const bEdges = b.levels["0"].edges.map((e) => `${e.source}-${e.target}`);
-    // Not strictly guaranteed to differ, but overwhelmingly likely with different seeds
+    const options = {
+      clusterCount: 8,
+      nodesPerCluster: 5,
+      interClusterDensity: 1,
+    };
+    const a = generateMockGraph({ seed: 1, ...options });
+    const b = generateMockGraph({ seed: 2, ...options });
+    const aEdges = a.levels["0"].edges.map(
+      (e) => `${e.source}-${e.target}-${e.weight}-${e.similarity}`,
+    );
+    const bEdges = b.levels["0"].edges.map(
+      (e) => `${e.source}-${e.target}-${e.weight}-${e.similarity}`,
+    );
+    // With dense inter-cluster edges and 8 clusters, seeds will produce different weights/similarities
     expect(aEdges).not.toEqual(bEdges);
   });
 
@@ -157,17 +166,25 @@ describe("generateMockGraph", () => {
     expect(g.levels["2"].nodes).toHaveLength(3); // no word nodes
   });
 
-  it("handles edgeDensity=0 producing no edges except inter-cluster", () => {
+  it("handles edgeDensity=0 producing no intra-cluster or inter-cluster edges", () => {
     const g = generateMockGraph({
       clusterCount: 4,
       nodesPerCluster: 10,
       edgeDensity: 0,
       interClusterDensity: 0,
     });
-    // No edges at any level
+    const clusterNodeIds = new Set(g.levels["0"].nodes.map((node) => node.id));
+
     expect(g.levels["0"].edges).toHaveLength(0);
-    // Level 2 may still have top-word edges (weight=1, cluster→word)
-    // but no intra-cluster or inter-cluster edges
+    // Level 2 edges should only be top-word edges (cluster→word, weight=1)
+    expect(
+      g.levels["2"].edges.every(
+        (edge) =>
+          clusterNodeIds.has(edge.source as string) &&
+          !clusterNodeIds.has(edge.target as string) &&
+          edge.weight === 1
+      )
+    ).toBe(true);
   });
 
   // ── Spread affects centroid positions ────────────────────────────────

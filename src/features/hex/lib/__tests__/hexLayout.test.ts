@@ -80,18 +80,31 @@ describe("layoutRing", () => {
 
   it("assigns distinct hex ring radii for inner, middle, and outer tiers", () => {
     const result = layoutRing("C1", payload);
-    const tierRadii = new Map<string, Set<number>>();
+
+    const expectedDistanceByTier = {
+      inner: 1,
+      middle: 2,
+      outer: 3,
+    } as const;
+
+    const hexDistance = (
+      a: { q: number; r: number },
+      b: { q: number; r: number },
+    ) => {
+      const dq = a.q - b.q;
+      const dr = a.r - b.r;
+      return (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
+    };
+
     for (const node of result.rings) {
-      const tier = node.tier;
-      if (!tierRadii.has(tier)) tierRadii.set(tier, new Set());
-      // All inner nodes share the same ring radius (1), middle (2), outer (3)
-      // Verify that nodes within the same tier share hex coordinates from the same ring call
-      tierRadii.get(tier)!.add(node.hex.q);
+      expect(node.hex).toBeDefined();
+      const expectedDistance =
+        expectedDistanceByTier[
+          node.tier as keyof typeof expectedDistanceByTier
+        ];
+      expect(expectedDistance).toBeDefined();
+      expect(hexDistance(node.hex, result.center.hex)).toBe(expectedDistance);
     }
-    // If there are multiple tiers present, inner tier hex q-values should differ
-    // from outer tier hex q-values (testing structural placement, not exact distance)
-    const tiers = [...tierRadii.keys()];
-    expect(tiers.length).toBeGreaterThan(0);
   });
 
   it("throws for unknown cluster id", () => {
