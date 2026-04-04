@@ -46,6 +46,7 @@ export function layoutOverview(payload: GraphPayload): HexNode[] {
         type: n.type,
         importance: n.importance ?? 0.5,
         childCount: n.childCount,
+        colorIndex: clusterIdx,
         px,
         py,
         hex,
@@ -78,6 +79,16 @@ export function layoutRing(
   if (!clusterNode) {
     throw new Error(`Cluster ${centerId} not found`);
   }
+
+  // Build stable color index mapping: clusters sorted by size (same order as overview)
+  const sortedKeys = Object.keys(payload.levels).sort();
+  const topLevelKey = sortedKeys[0] ?? "0";
+  const topLevel = payload.levels[topLevelKey];
+  const clusterOrder = topLevel.nodes
+    .filter((n) => n.type === "cluster")
+    .sort((a, b) => (b.size ?? 0) - (a.size ?? 0))
+    .map((n) => n.id);
+  const clusterColorIndex = new Map(clusterOrder.map((id, i) => [id, i]));
 
   // Find all neighboring clusters and their edge weights
   const neighborWeights = new Map<string, number>();
@@ -122,6 +133,7 @@ export function layoutRing(
     type: clusterNode.type,
     importance: clusterNode.importance ?? 0.5,
     childCount: countClusterMembers(centerId, payload),
+    colorIndex: clusterColorIndex.get(centerId) ?? 0,
     px: cpx,
     py: cpy,
     hex: centerHex,
@@ -150,6 +162,7 @@ export function layoutRing(
         type: item.node.type,
         importance: item.node.importance ?? 0.5,
         childCount: countClusterMembers(item.id, payload),
+        colorIndex: clusterColorIndex.get(item.id) ?? 0,
         px,
         py,
         hex,

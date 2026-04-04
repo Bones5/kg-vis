@@ -9,6 +9,8 @@ export interface HexNode {
   type: string;
   importance: number;
   childCount?: number;
+  /** Stable index used by distinctColor() for per-node coloring. */
+  colorIndex: number;
   px: number;
   py: number;
   hex: HexCoord;

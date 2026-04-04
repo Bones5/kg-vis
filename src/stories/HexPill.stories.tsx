@@ -8,6 +8,7 @@ const baseNode: HexNode = {
   type: "cluster",
   importance: 0.8,
   childCount: 12,
+  colorIndex: 0,
   px: 120,
   py: 80,
   hex: { q: 0, r: 0 },
@@ -59,7 +60,7 @@ export const Dimmed: Story = {
 export const TierOuter: Story = {
   args: {
     tier: "outer",
-    node: { ...baseNode, id: "C2", label: "Art", importance: 0.45, childCount: 4 },
+    node: { ...baseNode, id: "C2", label: "Art", importance: 0.45, childCount: 4, colorIndex: 5 },
   },
 };
 

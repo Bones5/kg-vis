@@ -1,6 +1,6 @@
 import { memo, KeyboardEvent, type CSSProperties } from "react";
 import type { HexNode, RingTier } from "@/shared/types/hex";
-import { importanceToColor } from "@/shared/lib/colors";
+import { distinctColor } from "@/shared/lib/colors";
 
 interface Props {
   node: HexNode;
@@ -24,7 +24,7 @@ export const HexPill = memo(function HexPill({
   onHover,
   onClick,
 }: Props) {
-  const color = importanceToColor(node.importance);
+  const color = distinctColor(node.colorIndex);
 
   const classes = [
     "hex-pill",
